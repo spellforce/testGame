@@ -1,0 +1,36 @@
+GIMP Palette
+Name: Iron Horizon 32
+Columns: 8
+#
+ 14  17  16	ink
+ 27  33  31	steel.1
+ 37  42  40	steel.2
+ 53  58  54	steel.3
+ 75  82  77	steel.4
+102 112 106	steel.5
+142 150 141	steel.6
+184 190 176	steel.7
+215 213 191	bone
+238 240 223	white
+ 59  51  40	sand.0
+ 94  82  64	sand.1
+133 118  87	sand.2
+179 164 133	sand.3
+216 203 166	sand.4
+ 58  29  23	rust.0
+110  47  34	rust.1
+168  59  50	rust.2
+201  77  60	rust.3
+236 139 120	rust.4
+ 92  53  20	amber.0
+167 100  31	amber.1
+233 169  58	amber.2
+245 210 122	amber.3
+ 46  53  34	olive.0
+ 86  97  60	olive.1
+152 166 107	olive.2
+ 30  59  64	cyan.0
+ 43  95 101	cyan.1
+ 61 135 142	cyan.2
+142 206 209	cyan.3
+213 193  90	hazard

@@ -1,75 +1,64 @@
 # Validation Checklist
 
-Use this list when reviewing mockups, the first Godot prototype, and each art batch. Each item should pass or have a written exception.
+Check these when reviewing art, the first Godot build, and every new batch.
 
-## Documentation Consistency
+## Numbers
 
-- [ ] Every color, spacing, type size, and duration used in other documents or in the theme exists in [02 Design Tokens](02-design-tokens.md).
-- [ ] No near-duplicate colors outside the token list were introduced in art or theme files.
-- [ ] Vertical layout budget sums to 1080: 136 + 16 + 746 + 16 + 118 + 48.
-- [ ] Card anatomy zones sum to 252 px tall: 28 + 128 + 20 + 48 + 28.
+- [ ] Card rows add up to 56: 1 + 12 + 1 + 29 + 12 + 1. Columns add up to 48: 1 + 46 + 1.
+- [ ] Card ratio is 48 : 56 (1 : 1.18), matching the engine collider 0.42 x 0.495 units.
+- [ ] Board is 1104 x 644 art px (23 cards wide, 11.5 cards tall; ratio 1.714).
+- [ ] Slot band: 14 + 81 + 9 = 104. Pack slots are 60 x 81 art px.
+- [ ] 9 slots at 64 px pitch = 560 px, centered in 1104.
+- [ ] UI layout: list panel 4 + 380 + 5 + info panel 147 + 4 = 540.
 
-## Layout and Scaling
+## Match With Stacklands (Compare With 1.jpeg / 2.jpeg)
 
-- [ ] At 1920 x 1080, the HUD bands never overlap the tabletop (y 152 to 898).
-- [ ] At 1280 x 720, all text stays at or above the token minimums after scaling, and nothing is clipped.
-- [ ] At 1920 x 1200 (16:10), extra height becomes field bleed; card size relative to the board is unchanged.
-- [ ] At 2560 x 1080 (ultrawide), HUD content stays inside the centered 1728 px safe width.
-- [ ] At 390 x 844 (compact mode), the board pans, overlays go full height, and no text falls below the minimum.
-- [ ] Zoom clamps at 0.80x and 1.25x, and zoom centers on the pointer.
-- [ ] 8 to 10 separate cards, or 5 to 7 small stacks, fit at 1.00x without crowding.
+- [ ] At minimum zoom on 1080p, a card is 48 x 56 screen px and the board takes about 58% of the screen width.
+- [ ] Dragging empty board or world pans; dragging a card moves the card.
+- [ ] Grabbing a card in the middle of a stack takes it and the cards on top of it.
+- [ ] Only the header of lower cards shows in a stack, and every title in a 10-card stack is readable.
+- [ ] Overlapping stacks drift apart on their own, slowly, and the lighter stack moves more.
+- [ ] A dragged card never pushes and is never pushed; only a root card pushes at all.
+- [ ] A dropped card stays where it was released, and is never sent back to where it was picked up.
+- [ ] Releasing outside the card area slides the card to the nearest legal spot (11 px inside the edge).
+- [ ] The align-to-grid action snaps free cards to an 86 x 96 px grid and flashes a faint grid overlay.
+- [ ] Opened packs throw cards out one at a time in arcs.
+- [ ] Pausing shows "PAUSED" and cards can still be moved.
+- [ ] The board can't be panned fully off screen.
+
+## Pixel Art
+
+- [ ] Every asset uses only the 32 palette colors.
+- [ ] No blurry pixels anywhere: check textures use Nearest filtering and no mipmaps.
+- [ ] No card is ever scaled or rotated (check flip, spawn, hit, destroy).
+- [ ] Cards at rest sit on whole art pixels.
+- [ ] At zoom 0.5, 1.0, 1.5 and 2.0 on 1080p every art pixel is the same size.
+- [ ] In between those zooms, uneven pixels are barely visible; the pixel-perfect setting removes them.
+- [ ] Text is drawn only at native size or whole multiples in the UI.
+- [ ] Icons pass the checklist in [08 Asset Production](08-asset-production.md).
 
 ## Cards
 
-- [ ] Each of the 6 families is identifiable at 0.80x in **grayscale** (shape cues only).
-- [ ] Titles fit or truncate cleanly at 20 px, then 15 px, and never wrap.
-- [ ] In a cascade of 8 cards, every card's title and category tab are readable.
-- [ ] Badges stay at fixed anchors; an empty anchor leaves no gap artifact.
-- [ ] Enemy art breakout does not cover the title text.
-- [ ] Equipment attached to a vehicle shows its header and left strip, and the cyan connector is visible.
-- [ ] Card backs show their family tab.
-- [ ] Grade inserts never change card size or family color.
+- [ ] All 6 families are recognizable in a grayscale screenshot, by shape cue alone.
+- [ ] Every card title fits in the header with no wrapping.
+- [ ] Badges stay readable on every family body (especially the enemy's right badge).
+- [ ] Disabled cards still show a readable title.
 
-## Art Quality
+## UI
 
-- [ ] Every illustration passes the 3-value grayscale test at 164 x 128.
-- [ ] The subject fills 55 to 70% of the art window, and the focal point lies inside the 140 x 108 safe area.
-- [ ] Saturated cyan, amber, and red cover less than 10% of any illustration.
-- [ ] Lighting direction is consistent: key upper-left, rim right.
-- [ ] Wear never covers the title, badges, or icons.
-- [ ] Assets follow the naming convention and are delivered at 2x.
-- [ ] Art is sharp at 1.25x on a 1440p or 4K display and clean (no shimmer) at 0.80x.
-
-## Interaction and Motion
-
-- [ ] Grab lift begins on the same frame as the press.
-- [ ] Drag follows the pointer 1:1, with tilt limited to 4 degrees.
-- [ ] Valid and invalid targets are distinguishable without color (brackets vs. cross glyph).
-- [ ] Snap distance is 64 px; releasing outside the tabletop returns the card.
-- [ ] Push-apart never moves the card that was already there.
-- [ ] No animation blocks input for more than 400 ms; grabbing mid-animation completes the animation instantly.
-- [ ] At most one `motion.loop` pulse is active on the board.
-- [ ] Reduced motion removes scale, shake, tilt, and camera moves while keeping every state readable.
-- [ ] Heavy-hit camera shake can be turned off on its own.
-
-## Menus and HUD
-
-- [ ] Every screen is fully usable with mouse only, keyboard only, and controller only.
-- [ ] Every screen opens with a sensible default focus; Esc or B goes back one level.
-- [ ] Destructive actions require confirmation and are never the default focus.
-- [ ] Toasts show at most 2 at a time and never cover the tabletop center.
-- [ ] The card-capacity counter changes state at 90% and 100% with both color and icon.
-- [ ] UI scale (90 to 125%) affects HUD and menus only.
+- [ ] UI stays sharp at 1280 x 720 (1x), 1920 x 1080 (2x), 2560 x 1440 (2x) and 3840 x 2160 (4x).
+- [ ] On 21:9 screens the left column stays on the left, the top-right boxes on the right, and the world fills the middle.
+- [ ] Every button is at least 16 UI px tall.
+- [ ] Every menu can be used with the keyboard.
+- [ ] Quitting and other destructive actions ask for confirmation, with the safe option focused.
 
 ## Accessibility
 
-- [ ] Body text contrast is at least 4.5:1; large display text at least 3:1 (check `text.secondary` on `surface.panel` and `surface.inset`).
-- [ ] The colorblind-safe accent option keeps all shape cues.
-- [ ] No flashing faster than 3 times per second.
-- [ ] Interactive hit areas are at least 44 x 44 px at 1080p.
-- [ ] Every state conveyed by color is also conveyed by shape, icon, or text.
+- [ ] Card titles meet 4.5:1 contrast (values in [02 Design Tokens](02-design-tokens.md)).
+- [ ] No flashing more than 3 times per second.
+- [ ] Reduced motion and camera shake settings work.
 
 ## Performance
 
-- [ ] 60 FPS with 150 cards on the board on target hardware.
-- [ ] No per-card node creation during drag; particles and damage numbers come from pools.
+- [ ] 60 FPS with 200 cards on the board.
+- [ ] No new nodes created during a drag.

@@ -1,122 +1,110 @@
 # Menus and HUD
 
-Menus look like the convoy's command console: stamped steel panels, enamel labels, toggle switches, and stenciled headings. They must stay quick to navigate. Every screen works with mouse, keyboard, and controller.
+All UI is pixel art on a 960 x 540 UI canvas, integer-scaled to the screen (2x at 1080p, 3x at 1440p, 4x at 4K). Layout positions are in [03 Canvas and Layout](03-canvas-layout.md).
 
-## Shared Panel Kit
+Stacklands uses cream paper panels with black ink outlines. We use steel plates with enamel labels.
 
-| Component | Spec |
+## Panel Kit
+
+All panels are 9-slice sprites (see [08 Asset Production](08-asset-production.md)).
+
+| Component | Look |
 | --- | --- |
-| Panel | `surface.panel` fill, 1 px `line.steel` edge, `radius.panel`, 4 corner rivets (6 px), `alpha.grain` texture |
-| Inset | `surface.inset`, 1 px inner shadow, used for lists and fields |
-| Primary button | 280 x 52 px, `accent.amber` fill, `surface.inset` text, `type.ui.lg`, `radius.control`, 2 px darker bottom lip |
-| Secondary button | 280 x 48 px, `surface.elevated` fill, `text.primary`, 1 px `line.steel` |
-| Danger button | Secondary style with a `state.threat` 3 px left bar and `state.threat.text` label |
-| Icon button | 44 x 44 px minimum hit area, 24 px icon |
-| Toggle | Industrial lever switch: 52 x 28 px, cyan when on |
-| Slider | 4 px track in `line.dim`, filled with `accent.cyan`, 16 x 24 px handle plate |
-| Tab | Stenciled label on a steel tab; the active tab connects to the panel below and uses `text.primary` |
-| Focus ring | 2 px `accent.cyan` outline 3 px outside the element, plus corner brackets on large elements |
+| Panel | `steel.2` body, 1 px `ink` outline, 1 px `steel.3` inner highlight on top and left, 2 x 2 rivets (`steel.5`) in the corners |
+| Light plate (list rows, headers) | `bone` body, `ink` text, 1 px `ink` outline |
+| Inset (lists, text boxes) | `steel.1` body, 1 px `ink` inner shadow on top and left |
+| Primary button | `amber.2` body, `ink` text, 2 px `amber.1` bottom lip; pressed: lip gone, content 1 px lower |
+| Normal button | `steel.3` body, `bone` text, 2 px `steel.1` lip |
+| Danger button | `steel.3` body, `rust.4` text, 2 px `rust.1` left bar |
+| Tab | Active: `bone` with `ink` text, connected to the panel. Inactive: `steel.3` with `steel.7` text |
+| Checkbox | 9 x 9, `ink` outline, `cyan.3` check mark |
+| Slider | 3 px `steel.1` track, `cyan.2` fill, 5 x 9 `steel.7` handle |
+| Scrollbar | 4 px wide, `steel.1` track, `steel.5` thumb |
+| Focus | 1 px `cyan.3` outline 1 px outside the element |
 
-Button hover: fill brightens 8% over `motion.instant`. Pressed: 1 px down, `.deep` fill. Disabled: 40% opacity, no hover.
+Minimum button height: 16 UI px (32 screen px at 1080p).
 
-## Screen Flow
+## In-Game HUD
 
-```text
-Boot/Splash -> Title -> (Continue | New Run -> Run Setup) -> Tabletop (run)
-                    \-> Settings, Collection, Credits, Quit
-Tabletop -> Pause -> (Resume | Settings | Save & Quit to Title)
-Tabletop -> Run Result -> Title | New Run
-```
+Like Stacklands: a left column for the task list and hovered card info, and small boxes at the top right.
 
-## Title Screen
+### List Panel (Left, Top)
 
-- Full-bleed key art: a convoy silhouette on a ridge at dusk, dust haze, and one warm headlamp beam. Slow parallax dust at 3 px/s.
-- The game logo sits upper left at 96 px margins, with the `type.display.xl` wordmark treatment.
-- The menu stack is left-aligned under the logo at x = 96, with 12 px gaps: Continue (primary; only if a save exists), New Run, Collection, Settings, Credits, Quit.
-- The version string is bottom right in `type.ui.xs`, `text.muted`.
-- On first load, the menu fades in 300 ms after the art. No button bounces.
+- 172 x 380 UI px.
+- 2 tabs across the top (for example "Tasks" and "Ideas" / recipes), 18 UI px tall, `font.ui`.
+- Collapse button (18 x 18) with a `<` arrow at the right edge. Collapsed, only the button stays on screen.
+- List rows: 12 px checkbox + text, 16 px line height, wraps to more lines when needed. Group headers use the light plate with a `-` / `+` toggle.
+- Footer message under the list (for example, "Complete 2 more tasks to unlock a pack") in `amber.2`.
 
-## Run Setup
+### Info Panel (Left, Bottom)
 
-- Centered panel, 1120 x 720 px.
-- Left, 520 px wide: starting convoy or board options, as a list of selectable plates.
-- Right: a preview of 3 to 5 starting cards at 1.00x card scale on a mini tabletop surface.
-- Bottom right: Start Run (primary). Bottom left: Back (secondary).
+- 172 x 147 UI px.
+- Hovered card: title bar in the card's body color with its title, then the description in `font.ui`, `bone` on `steel.2`.
+- Empty when nothing is hovered.
 
-## In-Run HUD
+### Resource Box (Top Right)
 
-### Top Band (1728 x 136, content y 16 to 120)
+- 128 x 27 UI px, 3 counters with a 9 x 9 icon each (for example, food, money, card count "4/20").
+- A counter that is over its limit shows its number in `rust.4` and blinks the icon twice.
 
-```text
-[Day/Cycle plate] [Phase timer bar ...........]   [Fuel] [Scrap] [Ammo] [Food]   [Card cap 18/20] [||] [gear]
- left group                                          center resource group            right group
-```
+### Time Box (Top Right)
 
-- **Left**: cycle/day plate (stenciled number in a 64 x 64 bone enamel plate) and a 360 x 10 px phase timer bar in amber. The end of the bar carries a small marker for the next event.
-- **Center**: up to 5 resource counters. Each counter is a 24 px icon plus a `type.ui.md` bold value on an inset plate, 112 x 40 px. Resource names and icons stay generic until gameplay defines them.
-- **Right**: card-capacity counter, which turns amber at 90% and red at 100%. Then pause (44 x 44) and settings (44 x 44).
-- **Notices**: short toasts drop from under the band's center, 480 px max width, and stay 3 s. At most 2 visible; older ones slide up and out.
+- 182 x 27 UI px: day/moon count text on the left, a thin `amber.2` progress bar along the bottom showing the cycle, and a 16 x 16 pause/play button at the right.
 
-### Bottom Band (1728 x 118)
+## Screens
 
 ```text
-[Context action panel 520 w] ....... [Queue / tray slots x 6] ....... [Zoom - 100% +] [speed x1 x2] [log]
+Title -> New Game / Continue -> Game
+     \-> Settings, Credits, Quit
+Game -> Pause Menu -> Resume / Settings / Save and Quit
+Game -> Game Over / Win Screen -> Title
 ```
 
-- **Context action panel** (left, 520 x 96): shows the selected card's name, family icon, and 1 to 2 context buttons (for example, Sell or Scrap). It is empty and dimmed when nothing is selected.
-- **Tray slots** (center): 6 slots, 72 x 96 px each (a card-back silhouette at 0.4x). Use them for purchasable packs, a build queue, or incoming reinforcements, as gameplay decides.
-- **Right tools**: zoom stepper, speed toggle (if real-time), and an event log button.
+### Title Screen
 
-### On-Board Overlays
+- The world canvas with the board in the center, zoomed out, camera drifting slowly (4 art px/s). This is the key art; no separate painting needed.
+- Logo top center: pixel lettering, about 320 x 64 UI px, `bone` with `rust.2` shadow and rivets.
+- Button column under the logo, 120 UI px wide, 20 UI px tall, 4 UI px gaps: Continue (primary, only with a save), New Game, Settings, Credits, Quit.
+- Version number bottom right, `steel.7`.
 
-- Card tooltips and the inspect view are specified in [04 Card System](04-card-system.md).
-- Off-screen threat markers: a red chevron at the tabletop edge pointing toward an enemy outside the camera view, 28 px, with a distance-based opacity of 60 to 100%.
-- Tutorial callouts: a bone enamel note panel with a cyan leader line to the target, 320 px max width, blocking only the target area.
+### Pause Menu
 
-## Pause Menu
+- `overlay.modal` over the whole screen.
+- Centered panel 200 x 180 UI px: Resume (primary), Settings, Save and Quit (normal), Quit to Desktop (danger, asks for confirmation).
 
-- Scrim `surface.scrim` over everything except the cursor.
-- Left-anchored panel, 420 px wide and full height minus 96 px: Resume (primary), Settings, Controls, Save & Quit to Title, Quit to Desktop (danger, with confirmation).
-- The tabletop stays visible but dimmed under the scrim, so the player keeps context.
+### Settings
 
-## Settings
+Panel 400 x 300 UI px with tabs: Game, Display, Audio, Controls.
 
-Tabbed panel, 960 x 680 px. Tabs: Gameplay, Display, Audio, Controls, Accessibility.
+- **Display**: window mode, resolution, VSync, pixel-perfect zoom (on/off), UI scale (auto, or a fixed whole number).
+- **Audio**: master, music, sound effects, ambient.
+- **Game**: reduced motion, camera shake, pan with keys, pan with screen edge.
+- **Controls**: key list with rebind buttons.
 
-- **Display**: resolution, window mode, UI scale (90% to 125%, affects HUD and menus only, never card size relative to the board), VSync, frame cap.
-- **Audio**: master, music, SFX, UI, ambient sliders.
-- **Controls**: rebind list; each row shows action name, primary binding, and secondary binding.
-- **Accessibility**: reduced motion, screen shake on/off, colorblind-safe accents (swap cyan/red pair for a blue/orange pair with shape cues unchanged), text size (+0, +1, +2 steps), hold-to-drag vs click-to-pick-up.
+### Confirmation Dialog
 
-## Confirmation Modal
+- 220 x auto UI px, centered.
+- Message in `font.ui`, 2 buttons at the bottom right. The safe option is focused first.
 
-- 520 x auto px (min 220) panel, centered.
-- Heading `type.display.md`, body `type.ui.md`, max 3 lines.
-- Buttons bottom right: the safe choice is focused by default. Destructive actions use the danger style and never sit in the default focus position.
+### Game Over / Win
 
-## Run Result
-
-- Full-screen panel over the dimmed final board.
-- Headline in `type.display.lg`: a stenciled "CONVOY LOST" (threat stamp) or "ROUTE SECURED" (cyan stamp), stamped in with `scale.impact`.
-- Stat rows count up one by one (150 ms stagger).
-- Buttons: New Run (primary), Return to Title.
+- `overlay.modal`, centered panel 280 x 200 UI px.
+- Stamp-style headline (`font.ui.heading`): "CONVOY LOST" in `rust.3` or "ROUTE SECURED" in `cyan.3`, appearing in 2 frames (large → final position, as drawn frames).
+- A few stats, counting up one after another.
+- Buttons: New Game (primary), Title.
 
 ## Cursor
 
-| State | Cursor |
+Hardware cursor, pixel art, drawn at 1x and provided at 2x and 4x.
+
+| State | Sprite (1x) |
 | --- | --- |
-| Default | Small steel arrow, 24 px, dark outline |
-| Hover grabbable card | Open gauntlet hand |
-| Dragging | Closed gauntlet hand |
-| Invalid target | Closed hand plus a small red cross |
-| Pan | Four-way arrow plate |
-| UI hover | Default arrow; buttons show their own hover state |
+| Default | 9 x 12 arrow |
+| Over a card | 11 x 11 open hand |
+| Holding a card | 11 x 11 closed hand |
+| Panning | 11 x 11 closed hand with 4 arrows |
 
-Provide cursors at 32 px and 48 px (for high-DPI and UI scale), with the hotspot at the fingertip or arrow tip.
+## Keyboard / Controller
 
-## Focus and Navigation Rules
-
-- Every menu opens with a sensible default focus (the primary button).
-- The focus order follows visual order: top to bottom, then left to right.
-- Esc or controller B always goes back one level; on the title screen it does nothing.
-- Menus never trap focus in a hidden element; closing a modal returns focus to the element that opened it.
+- Menus: arrow keys / D-pad move focus; Enter / A confirms; Esc / B goes back.
+- Board navigation with a controller: a focus cursor jumps to the nearest card in the stick direction; A picks up and drops; the left stick moves a held card; the right stick pans. This is a later goal. The first version is mouse only.

@@ -1,101 +1,95 @@
 # Card System
 
-## Shared Footprint
+All six card types share one 48 x 56 art px footprint, so stacking, dragging and hit testing work the same for every card.
 
-| Property | Value at 1.00x |
-| --- | --- |
-| Outer size | 180 x 252 px |
-| Aspect ratio | 5:7 |
-| Corner radius | 6 px (`radius.card`) |
-| Outer frame | 8 px steel frame, 1 px `line.steel` edge light |
-| Inner content area | 164 x 236 px |
-| Hit area | Outer rect + 6 px forgiving margin |
-| Source art resolution | 2x: 360 x 504 px card, 328 x 256 px art window |
-
-All six families share this footprint so stacking, dragging, snapping, and hit testing stay uniform. Family identity comes from frame accents, tabs, and art, never from a different card size.
-
-## Anatomy
+## Pixel Anatomy
 
 ```text
-+------------------------------------+  y=0
-| [cat tab]              [corner slot]|  0..28   Header strip (28 px)
-| TITLE NAME (display.md / ui.md)    |
-+------------------------------------+  28
-|                                    |
-|                                    |
-|          ART WINDOW                |  28..156  (164 x 128 px)
-|          164 x 128                 |
-|                                    |
-+------------------------------------+  156
-| [type line / subtitle ui.sm]       |  156..176
-+------------------------------------+
-|                                    |
-|   INFO PANEL (inset, 164 x 48)     |  176..224  Short descriptor or progress
-|                                    |
-+------------------------------------+  224
-| [badge L]   [family rail]  [badge R]|  224..252  Footer (28 px) value badges
-+------------------------------------+  252
+x: 0         1 ........................ 46        47
+y0   ink outline (corner pixels removed = 1 px rounded corners)
+y1   +------------------------------------------+
+     | HEADER  12 rows: card title, font.card    |  y1-12
+y12  +------------------------------------------+
+y13  separator: 1 row, darker shade of the body   y13
+y14  +------------------------------------------+
+     |                                          |
+     |      ART AREA 46 x 37                    |  y14-50
+     |      icon up to 32 x 26, centered        |
+     |                                          |
+y50  +------------------------------------------+
+y51  | [badge L]    family cue      [badge R]   |  y51-62  FOOTER 12 rows
+y62  +------------------------------------------+
+y63  ink outline
 ```
 
-Measurements are from the outer card top; horizontal content respects the 8 px frame.
+Rows add up to 64: outline 1 + header 12 + separator 1 + art 37 + footer 12 + outline 1.
+Columns add up to 48: outline 1 + content 46 + outline 1.
 
-### Zone Rules
+| Zone | Rule |
+| --- | --- |
+| Outline | 1 px `ink` all around. Corner pixels are transparent (1 px rounding). |
+| Header | Card body color. Title in `font.card` (10 px), left-aligned at x 3, baseline so the text sits in rows 2 to 11. Max 4 CJK characters or about 8 Latin letters. No wrapping and no ellipsis: card data must provide a short name. |
+| Separator | One row, the next darker shade of the body color |
+| Art area | Card body color with a 1-row lighter top highlight. Icon centered, max 32 x 26; its bottom may cast a 1 px `ink` shadow. |
+| Footer | Up to 2 badges and the family cue (see [05 Card Families](05-card-families.md)) |
 
-- **Header strip**: title left aligned after the 24 x 20 px category tab. Titles fit one line at `type.display.md` (20 px); if too long, step down once to `type.ui.md` (15 px) and then truncate with an ellipsis. Never wrap to two lines.
-- **Corner slot** (top-right, 22 x 22 px): at most one state glyph such as timer, lock, new, or alert.
-- **Art window**: fixed crop. Art must keep its focal subject inside the central 140 x 108 px safe area. Enemies may break the upper art boundary by up to 10 px into the header behind the title plate.
-- **Type line**: `type.ui.sm`, `text.secondary`. Family name plus optional subtype.
-- **Info panel**: reserved for a short descriptor, progress bar, or a two-icon summary. Maximum 2 lines of `type.ui.sm`. Details beyond that go to tooltip/inspect view.
-- **Footer**: up to two 36 x 22 px value badges at left and right anchors. The center holds the family rail graphic. Badges never move; unused badge anchors remain empty.
+The header is the part that stays visible in a stack, which is why the title lives there.
 
 ## Badges
 
-| Badge | Shape | Default color |
-| --- | --- | --- |
-| Primary value (left) | Stamped plate, 3 px radius | `material.bone` fill, `surface.inset` text |
-| Secondary value (right) | Stamped plate | `surface.elevated` fill, `text.primary` text |
-| Damage/threat value | Chipped plate with notch | `state.damage` fill, `text.primary` text (5.4:1) |
-| Timer / progress | Thin 4 px bar in info panel or 22 px corner radial | `accent.amber` |
-| Count (stack) | Hex nut plate, 26 x 22 px, top-right of stack | `surface.elevated`, `text.primary` |
+Stacklands shows small values in the bottom corners (for example, sale value and health). We keep 2 badge anchors. Gameplay decides what they mean.
 
-Badge values use `type.ui.xs` bold numerals, minimum 11 px. Future gameplay decides what the values mean; presentation only guarantees slots.
+| Badge | Position | Size | Style |
+| --- | --- | --- | --- |
+| Left | x 2, y 52 | 13 x 9 | `bone` plate, `ink` outline, `ink` digits (`font.digits.small`) |
+| Right | x 33, y 52 | 13 x 9 | `rust.2` plate, `ink` outline, `white` digits |
+| Icon badge | Replaces a number with a 5 x 5 icon (heart, coin, bolt) | 13 x 9 | Same plates |
 
-## Visual States
+Up to 2 digits per badge. Values of 100 or more show as "99".
 
-| State | Treatment | Motion token |
-| --- | --- | --- |
-| Resting | `shadow.card`; frame at normal value | --- |
-| Hover | Scale `scale.hover`, frame edge light +10% value, tooltip timer starts | `motion.instant` |
-| Pressed / grabbed | Scale `scale.lift`, `offset.lift`, `shadow.lift`, z to `CardTransient` | `motion.fast` |
-| Dragging | Maintains lift; tilt up to 4 degrees toward drag velocity, returns to 0 at rest | continuous, damped |
-| Valid drop target | Target shows 2 px `accent.cyan` outline plus corner brackets | `motion.instant` |
-| Invalid drop | Held card outline `state.damage` 2 px; small cross glyph at corner slot | `motion.instant` |
-| Selected | 2 px `accent.cyan` outline + corner brackets, persists until deselect | `motion.fast` |
-| Busy / working | Info panel progress bar fills; frame unchanged | Linear per progress |
-| Disabled / exhausted | Art desaturated 60%, text `text.muted`, frame unchanged | `motion.standard` |
-| Damaged | Brief hit feedback, then persistent chipped-frame segment if applicable | `motion.impact` |
-| Destroyed | Dissolve sequence (see motion doc) | `motion.slow` |
-| New / unseen | Corner slot shows amber dot; clears on first hover | --- |
+## States
 
-States combine by priority: Dragging > Invalid > Selected > Damaged > Busy > Hover > Resting.
+Pixel art must not be scaled, so states use position offsets, outlines and palette swaps.
+
+| State | Treatment |
+| --- | --- |
+| Resting | Shadow at +1, +2 |
+| Hover | Card moves up 1 px (`lift.hover`); details appear in the info panel |
+| Held / dragging | Card moves up 4 px (`lift.drag`), shadow at +2, +6, drawn above everything else in the world |
+| Valid drop target | 1 px `cyan.3` outline drawn 1 px outside the card's outline |
+| Invalid drop (held card) | Same outline in `rust.3` |
+| Selected / keyboard focus | `cyan.3` outside outline, plus 3 px corner brackets 2 px outside the card |
+| Busy (timer running) | Timer bar above the stack (see below) |
+| Disabled / used up | Body colors swapped to the steel ramp of the same value (palette-swap shader); title stays readable |
+| Hit | Whole card flashes `white` for 2 frames (`motion.frame` each) |
+| New (not yet hovered) | A 3 x 3 `amber.3` dot at the header's right end, cleared on first hover |
+
+Priority when combined: Held > Invalid > Selected > Hit > Busy > Hover > Resting.
+
+## Timer Bar
+
+Stacklands shows a progress bar above a stack while it is working. Same here:
+
+- 40 x 5 px, centered 4 px above the stack's root card.
+- 1 px `ink` outline, `steel.2` background, `amber.2` fill (1 px `amber.3` highlight on the top row of the fill).
+- Fill grows left to right, updated every frame, no easing.
 
 ## Stacking
 
-- Stacks cascade straight down with a 32 px offset (`offset.stack`). The root card sits highest on screen and each added card lies over it 32 px lower, exposing the 28 px header strip of every card beneath. That is why title and category tab live in the header.
-- The last card added is fully visible at the bottom of the cascade.
-- Show up to 8 cascaded cards. Beyond 8, compress the oldest cards under the root and show the count plate on the root.
-- Grabbing any card lifts that card plus every card stacked on top of it (Stacklands-like). Grabbing the root moves the whole stack. Pulling a single card out of the middle is a gameplay/input decision (for example, a modifier key).
-- Optional: hovering a stack for 450 ms widens the cascade to `offset.stack.fan` (44 px) so the headers are easier to read; it collapses on exit. Drop targets use the collapsed geometry.
-- Snap onto a stack when the held card's center is within 64 px of the center of the stack's last (fully visible) card and the stack accepts it. The held card joins at the bottom of the cascade.
+Terms: the **root card** is the first card of a stack, highest on screen. The **top card** is the last one added, lowest on screen and fully visible.
+
+- Each card placed on a stack sits 12 px (`stack.offset`) lower than the one below it, so the 12-row header of every lower card stays visible.
+- Stack height = 56 + 12 x (n - 1). A 10-card stack is 164 px, about 2.9 card heights.
+- Open decision: in Stacklands a working or equipped card shrinks to 0.8 scale, and a stack's cards shift as it grows. Scaling pixel art by 0.8 breaks the pixel grid, so these two rules conflict. Either accept soft pixels in those two cases, or keep cards at full size and show the same states with the timer bar and a 5 x 5 work icon. Decide before drawing the card frames.
+- No visible limit. Above 10 cards, a count plate (`font.digits`, `steel.2` plate) appears at the right end of the root card's header.
+- Grabbing a card picks up that card and every card on top of it. Grabbing the root card moves the whole stack.
+- Drop onto a stack: when the held card's rectangle overlaps another card and that card accepts it (no distance limit). It lands on the stack's last card. See [06 Interaction and Motion](06-interaction-motion.md).
+- Stacks that overlap other stacks without joining them are pushed apart (see [06 Interaction and Motion](06-interaction-motion.md)).
 
 ## Card Back
 
-Card backs use the same frame with a full-face emblem panel. Each family has a back variant (see [05 Card Families](05-card-families.md)) with its family tab visible so undrawn or unrevealed cards still communicate category.
+Same frame. The header shows the family color with no title. The art area shows the family emblem (24 x 24). Used for unopened pack contents and event cards before they flip.
 
-## Inspect View
+## Hit Area
 
-Right-click, controller Y, or long-press opens an inspect view: the card at 2x (360 x 504 px) centered over a `surface.scrim`, with an adjacent 420 px wide detail panel. The inspect view is the only place full descriptions appear.
-
-## Tooltip
-
-After 500 ms hover on a resting card, show a 280 px max-width tooltip at the card's right edge (left if near viewport edge), 12 px offset. Content: title, family, up to 3 short lines. Hide immediately on drag.
+The full 48 x 56 rectangle, including the transparent corner pixels. For a stack, each lower card's hit area is only its visible 12 px strip; the top card uses its full rectangle.

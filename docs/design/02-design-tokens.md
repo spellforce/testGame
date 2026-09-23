@@ -1,103 +1,132 @@
 # Design Tokens
 
-These values are the authoritative visual constants for the first Godot implementation. Store them in `ui_theme.tres`, `card_style_library.tres`, and `motion_tokens.tres` as described in [09 Godot Handoff](09-godot-handoff.md).
+These are the only colors, fonts, sizes and timings to use. [09 Godot Handoff](09-godot-handoff.md) explains where they live in the project.
 
-## Color Tokens
+## Palette (32 Colors)
 
-| Token | Hex | Role |
+Save the palette as `art/palette/iron_horizon_32.gpl` (GIMP palette, which Aseprite also reads) and lock every sprite to it.
+
+| Token | Hex | Main uses |
 | --- | --- | --- |
-| `surface.field` | `#1B211F` | Tabletop base graphite-green |
-| `surface.panel` | `#252A28` | HUD, menu, card frame dark steel |
-| `surface.inset` | `#111514` | Card inner panel and input recess |
-| `surface.elevated` | `#353A36` | Raised controls and active tool plates |
-| `surface.scrim` | `#090B0AE0` | Modal and pause overlay |
-| `line.steel` | `#66706A` | Default frame edge and dividers |
-| `line.dim` | `#3D4642` | Secondary separations |
-| `text.primary` | `#EEF0DF` | Main readable label and number |
-| `text.secondary` | `#B8BEB0` | Secondary copy |
-| `text.muted` | `#7F8A80` | Disabled and low-priority copy |
-| `accent.cyan` | `#8ECED1` | Player ownership, focus, system state |
-| `accent.cyan.deep` | `#3D878E` | Cyan inset and pressed state |
-| `accent.amber` | `#E9A93A` | Actions, heat, energy, alerts |
-| `accent.amber.deep` | `#A7641F` | Amber inset and pressed state |
-| `accent.olive` | `#98A66B` | Neutral sites, search state, navigation |
-| `accent.yellow` | `#D5C15A` | Equipment identifiers and utility marking |
-| `state.threat` | `#C94D3C` | Enemy and threat accent (fills, tabs, rails; not for small text) |
-| `state.threat.text` | `#EC8B78` | Threat-colored text on dark surfaces (5.9:1 on panel, 4.7:1 on elevated) |
-| `state.damage` | `#A83B32` | Damage and destructive condition |
-| `state.success` | `#A9C478` | Confirmed positive state; use sparingly |
-| `material.bone` | `#D7D5BF` | Enamel plates and stenciled marks |
-| `material.dust` | `#968A70` | Environmental dust and low-priority texture |
+| `ink` | `#0E1110` | All outlines, dark text, pixel shadows |
+| `steel.1` | `#1B211F` | Deepest shadow on steel |
+| `steel.2` | `#252A28` | Fixed-building card body, UI panel body |
+| `steel.3` | `#353A36` | UI raised controls, dark metal |
+| `steel.4` | `#4B524D` | Board rail inner line, stencils, muted UI text on bone |
+| `steel.5` | `#66706A` | Board tread and seams |
+| `steel.6` | `#8E968D` | **Board base** |
+| `steel.7` | `#B8BEB0` | Metal highlights, board rail, secondary light text |
+| `bone` | `#D7D5BF` | Equipment card body, light UI plates, main UI text |
+| `white` | `#EEF0DF` | Light text on cards, brightest highlights, hit flash |
+| `sand.0` | `#3B3328` | Deep world shadow |
+| `sand.1` | `#5E5240` | World shadows |
+| `sand.2` | `#857657` | **World terrain base** |
+| `sand.3` | `#B3A485` | World highlights, dust particles |
+| `sand.4` | `#D8CBA6` | Sun-bleached highlights (sparingly) |
+| `rust.0` | `#3A1D17` | Rust shadow |
+| `rust.1` | `#6E2F22` | Rust, enemy card shading |
+| `rust.2` | `#A83B32` | **Enemy card body**, health badge |
+| `rust.3` | `#C94D3C` | Enemy highlights, invalid outline |
+| `rust.4` | `#EC8B78` | Red text on dark UI, damage numbers |
+| `amber.0` | `#5C3514` | Amber shadow |
+| `amber.1` | `#A7641F` | Event card shading, pressed buttons |
+| `amber.2` | `#E9A93A` | **Event card body**, timer bars, primary buttons |
+| `amber.3` | `#F5D27A` | Headlamps, sparks, amber highlights |
+| `olive.0` | `#2E3522` | Olive shadow |
+| `olive.1` | `#56613C` | **Searchable-building card body** |
+| `olive.2` | `#98A66B` | Olive highlights, positive numbers |
+| `cyan.0` | `#1E3B40` | Cyan shadow |
+| `cyan.1` | `#2B5F65` | **Vehicle card body** |
+| `cyan.2` | `#3D878E` | Vehicle highlights |
+| `cyan.3` | `#8ECED1` | Selection and focus outline, friendly UI accent |
+| `hazard` | `#D5C15A` | Equipment hazard stripe, warnings |
 
-## Alpha and Depth
+### Semi-Transparent Exceptions
 
 | Token | Value | Use |
 | --- | --- | --- |
-| `alpha.grain` | 0.05 | General grain overlay |
-| `alpha.dust` | 0.10 | Environmental dust overlay |
-| `alpha.wear.max` | 0.18 | Maximum local chip/soot mask |
-| `shadow.card` | `0 10 18 #07090873` | Resting card depth |
-| `shadow.lift` | `0 20 34 #05070699` | Held/dragged card depth |
-| `shadow.modal` | `0 28 80 #000000B3` | Modal depth |
-| `outline.focus` | 2 px | Selected card and keyboard focus |
-| `outline.invalid` | 2 px | Invalid drop indication |
+| `shadow.card` | `ink` at 45% | Card drop shadow |
+| `overlay.pause` | `ink` at 35% | Dims the world while paused |
+| `overlay.modal` | `ink` at 75% | Behind modal menus |
 
-Do not use broad background gradients. Material variation comes from textures, inset planes, shadows, and controlled edge light.
+### Checked Contrast (WCAG)
 
-## Spacing and Shape
+| Pair | Ratio |
+| --- | --- |
+| `white` on `cyan.1` (vehicle title) | 6.2 |
+| `white` on `rust.2` (enemy title) | 5.4 |
+| `white` on `olive.1` (searchable title) | 5.7 |
+| `ink` on `amber.2` (event title) | 9.2 |
+| `white` on `steel.2` (fixed-building title) | 12.6 |
+| `ink` on `bone` (equipment title) | 12.8 |
+| `bone` on `steel.2` (UI text on panels) | 9.8 |
+| `rust.4` on `steel.2` (red UI text) | 5.9 |
 
-Base unit: 4 px.
+Card bodies against the board are 1.4 to 4.8. Cards stand out from the board through their `ink` outline and drop shadow, not body color alone. Stacklands does the same with its cream cards.
+
+## Fonts
+
+Use free pixel fonts that cover Chinese. Both options below are released under the SIL Open Font License; confirm the license of the exact version you download.
+
+| Token | Font | Size | Use |
+| --- | --- | --- | --- |
+| `font.card` | Fusion Pixel Font 10px | 10 px | Card titles |
+| `font.ui` | Fusion Pixel Font 12px or Ark Pixel Font 12px | 12 px, line height 16 | All UI text |
+| `font.ui.heading` | `font.ui` drawn at 2x | 24 px | Menu titles, PAUSED label |
+| `font.title` | `font.ui` drawn at 4x, or a custom logo | 48 px | Title screen |
+| `font.digits.small` | Custom 3 x 5 digit sprite font | 5 px tall | Card badges |
+| `font.digits` | Custom 5 x 7 digit sprite font | 7 px tall | Damage numbers, stack count |
+
+Rules:
+
+- Only draw fonts at their native size or whole multiples.
+- A card title fits 4 Chinese characters or about 8 Latin letters. Longer names must be shortened in the card data (full name shows in the info panel).
+
+## Spacing
+
+World (art px): base unit 4. UI (UI px): base unit 4.
 
 | Token | Value |
 | --- | --- |
-| `space.1` | 4 px |
-| `space.2` | 8 px |
-| `space.3` | 12 px |
-| `space.4` | 16 px |
-| `space.5` | 20 px |
-| `space.6` | 24 px |
-| `space.8` | 32 px |
-| `space.10` | 40 px |
-| `radius.card` | 6 px |
-| `radius.panel` | 6 px |
-| `radius.control` | 4 px |
-| `radius.badge` | 3 px |
-| `line.default` | 1 px |
-| `line.strong` | 2 px |
+| `space.1` | 1 px |
+| `space.2` | 2 px |
+| `space.4` | 4 px |
+| `space.8` | 8 px |
+| `space.12` | 12 px |
+| `space.16` | 16 px |
 
-Cards and operational panels stay angular and compact. Do not use soft, oversized rounded containers.
+## Card and Board Constants (Art px)
 
-## Typography Scale
+| Token | Value |
+| --- | --- |
+| `card.size` | 48 x 56 |
+| `card.header` | 12 (title row) |
+| `stack.offset` | 12 (the header stays visible) |
+| `board.size` | 1104 x 644 |
+| `board.slot_band` | 104 (top row of slots) |
+| `world.size` | 2208 x 1288 |
+| `drop.snap_radius` | 23 (special drop zones only; stacking uses overlap) |
+| `grid.cell` | 86 x 96 (align-to-grid action) |
 
-| Token | Size / line height | Use |
+## Motion
+
+| Token | Value | Use |
 | --- | --- | --- |
-| `type.display.xl` | 42 / 46 px | Title screen game name |
-| `type.display.lg` | 28 / 32 px | Menu titles, major overlays |
-| `type.display.md` | 20 / 24 px | Panel headings, card title at full scale |
-| `type.ui.lg` | 18 / 24 px | Primary menu action |
-| `type.ui.md` | 15 / 20 px | Standard labels, HUD values |
-| `type.ui.sm` | 13 / 17 px | Card support labels, tabs |
-| `type.ui.xs` | 11 / 14 px | Badge values, status captions |
+| `motion.instant` | 60 ms | Hover response |
+| `motion.fast` | 120 ms | Lift, UI press |
+| `motion.standard` | 200 ms | UI panel moves |
+| `motion.slow` | 350 ms | Card launch from a pack, panel slide |
+| `motion.frame` | 83 ms | One frame of a 12 fps sprite animation (flashes, dissolve) |
+| `lift.hover` | 7 px | Card moves up on hover |
+| `lift.drag` | 11 px | Card moves up while held; shadow stays on the ground |
+| `shadow.rest` | +1, +2 px | Shadow offset at rest (x, y) |
+| `shadow.drag` | +2, +6 px | Shadow offset while held |
+| `zoom.min` / `zoom.default` / `zoom.max` | 0.5 / 1.0 / 2.0 | See [03 Canvas and Layout](03-canvas-layout.md) |
+| `zoom.step` | x1.15 per wheel notch, eased over 120 ms | |
+| `push.speed` | 228 art px/s | Root cards push overlapping cards apart, scaled by mass |
+| `pickup.snap` | 23 art px | Snap radius for packs and the sell box |
+| `send.speed` | 514 art px/s sideways, 571 up | Cards thrown out by packs and machines |
 
-Contrast checked against WCAG: `text.primary`, `text.secondary`, `accent.cyan`, `accent.amber`, and `accent.olive` pass 4.5:1 on `surface.panel` and `surface.inset`. `text.muted` (4.1:1 on panel) is only for disabled or non-essential copy. Never set text in `state.threat`; use `state.threat.text`.
+Easing, gravity, drag and bounce are the game's real physics values, listed in [06 Interaction and Motion](06-interaction-motion.md). Cards settle with `lerp(pos, target, dt * 20)`; thrown cards use gravity 3429 px/s2, air drag x0.93 per 20 ms and bounciness 0.6.
 
-Use normal letter spacing. Minimum interactive label size is `type.ui.md`; `type.ui.sm` is informational only.
-
-## Motion Tokens
-
-| Token | Duration | Curve | Use |
-| --- | --- | --- | --- |
-| `motion.instant` | 80 ms | ease-out | Hover border, cursor response |
-| `motion.fast` | 140 ms | ease-out | Lift, press, tooltip appear |
-| `motion.standard` | 220 ms | cubic-out | Snap, panel transition, card return |
-| `motion.slow` | 380 ms | cubic-in-out | Event arrival, modal open |
-| `motion.impact` | 120 ms | ease-out | Hit shake, badge pop |
-| `motion.loop` | 2200 ms | sine-in-out | Single urgent state pulse |
-| `scale.hover` | 1.015 | --- | Card hover only |
-| `scale.lift` | 1.035 | --- | Held card |
-| `scale.impact` | 1.06 then 1.0 | --- | Local feedback |
-| `offset.lift` | -12 px y | --- | Held card vertical lift |
-| `offset.stack` | 32 px y | --- | Vertical stack cascade (28 px header + 4 px gap) |
-| `offset.stack.fan` | 44 px y | --- | Hover-expanded stack cascade |
-
-Reduced motion replaces scale, shake, and slide with 80 ms opacity/outline changes. Refer to [06 Interaction and Motion](06-interaction-motion.md).
+`motion.*` durations are for UI only. Card motion is driven by the physics constants, not by fixed durations.

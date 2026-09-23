@@ -1,180 +1,164 @@
 # Godot Handoff
 
-Target: **Godot 4.x** (GDScript). This document maps the design to project structure so the visual rules live in shared resources rather than being scattered across gameplay code.
+Target: Godot 4.3 or newer, GDScript. 4.3 or newer is needed for the `TileMapLayer` node used for the world terrain.
+
+The HUD root is 960 x 540 UI px at 16:9. On other screen shapes it is larger (for example, 1280 x 720 UI px on a 1280 x 720 window at 1x), so anchor HUD panels to their corners instead of placing them at fixed coordinates.
+
+## Pixel Rendering Approach
+
+The world uses continuous zoom (like Stacklands), so it is **not** rendered into a fixed low-resolution viewport. Instead:
+
+- The world is drawn directly at screen resolution with a `Camera2D`. Textures use nearest-neighbor filtering, so art pixels stay sharp squares.
+- At whole-number zoom factors (1, 2, 3, 4 screen px per art px), every art pixel is exactly the same size. In between, some art pixels are 1 screen px wider than others. At these small ratios it is barely visible. The optional pixel-perfect zoom setting removes it.
+- The UI is on a separate `CanvasLayer` with its own integer scale.
 
 ## Project Settings
 
-| Setting | Value |
-| --- | --- |
-| `display/window/size/viewport_width` | 1920 |
-| `display/window/size/viewport_height` | 1080 |
-| `display/window/stretch/mode` | `canvas_items` |
-| `display/window/stretch/aspect` | `expand` (extra width or height becomes field bleed; see [03 Tabletop Layout](03-tabletop-layout.md)) |
-| `rendering/textures/canvas_textures/default_texture_filter` | `Linear Mipmap` |
-| `gui/theme/custom` | `res://themes/ui_theme.tres` |
+| Setting | Value | Why |
+| --- | --- | --- |
+| `display/window/size/viewport_width` | 1920 | Base resolution |
+| `display/window/size/viewport_height` | 1080 | |
+| `display/window/stretch/mode` | `disabled` | World and UI scaling are handled by script (see below) |
+| `rendering/textures/canvas_textures/default_texture_filter` | `Nearest` | Sharp pixels |
+| `rendering/2d/snap/snap_2d_transforms_to_pixel` | `true` | Removes sub-pixel shimmer |
+| `rendering/2d/snap/snap_2d_vertices_to_pixel` | `true` | |
+| `rendering/anti_aliasing/quality/msaa_2d` | `Disabled` | |
+| `application/run/max_fps` | 0, VSync on | |
+| Texture import (all art) | Compress mode `Lossless`, mipmaps off | Avoids blur and color changes |
 
-With `expand`, anchor the HUD to the centered 1920 x 1080 safe region, not to the viewport edges, so ultrawide screens keep the HUD inside the 1728 px safe width.
+### World Scaling
 
-## Directory Layout
+```gdscript
+# board_camera.gd
+var zoom_level := 0.5  # 0.5 (min) to 2.0 (max), see 02-design-tokens.md
+
+func _apply_zoom() -> void:
+    var screen_px_per_art_px := zoom_level * get_viewport_rect().size.y / 540.0
+    if Settings.pixel_perfect_zoom:
+        screen_px_per_art_px = maxf(1.0, roundf(screen_px_per_art_px))
+    zoom = Vector2.ONE * screen_px_per_art_px
+```
+
+### UI Scaling
+
+```gdscript
+# main.gd
+func _update_ui_scale() -> void:
+    var s := get_viewport().get_visible_rect().size
+    var ui_scale: int = maxi(1, floori(minf(s.x / 960.0, s.y / 540.0)))
+    if Settings.ui_scale_override > 0:
+        ui_scale = Settings.ui_scale_override
+    $HudLayer.transform = Transform2D.IDENTITY.scaled(Vector2.ONE * ui_scale)
+    $HudLayer/Root.size = s / ui_scale  # 960 x 540 at 1080p
+```
+
+Call both on start and whenever the window size changes.
+
+## Folders
 
 ```text
 res://
   art/
-    cards/
-      frames/        card_frame_<family>.png
-      backs/         card_back_<family>.png
-      illustrations/ card_art_<family>_<id>.png
-    ui/
-      icons/
-      panels/
-      cursors/
-    field/           tiles and decals
-    fx/              particle sprites
-    materials/       grunge, wear, and noise textures
-  fonts/
+    palette/       iron_horizon_32.gpl
+    cards/         frames/  backs/  icons/  states/
+    board/
+    world/         tiles/  props/  animals/
+    fx/
+    ui/            panels/  buttons/  icons/  cursors/
+    fonts/
+    src/           .aseprite sources (excluded from export)
+  data/
+    cards/         one .tres per card
+  scenes/
+    main/          Main.tscn
+    world/         World.tscn, Board.tscn, BoardCamera.tscn
+    cards/         Card.tscn, CardStack.tscn
+    ui/            Hud.tscn, ListPanel.tscn, InfoPanel.tscn, ResourceBox.tscn, TimeBox.tscn
+    menus/         TitleScreen.tscn, PauseMenu.tscn, Settings.tscn, GameOver.tscn, ConfirmDialog.tscn
+    fx/            DustPuff.tscn, Sparks.tscn, DamageNumber.tscn
+  scripts/
   themes/
     ui_theme.tres
-    card_style_library.tres
-    motion_tokens.tres
-    card_styles/
-      vehicle.tres  enemy.tres  searchable.tres
-      event.tres    fixed_building.tres  equipment.tres
   shaders/
-    card_dissolve.gdshader
-    card_state.gdshader      (desaturate, flash, outline)
-  scenes/
-    main/            Main.tscn, Boot.tscn
-    board/           Tabletop.tscn, FieldBackground.tscn, BoardCamera.tscn
-    cards/           Card.tscn, CardStack.tscn, CardPreview.tscn, CardTooltip.tscn
-    ui/
-      hud/           TopBar.tscn, BottomTray.tscn, ResourceCounter.tscn, Toast.tscn
-      menus/         TitleScreen.tscn, RunSetup.tscn, PauseMenu.tscn, Settings.tscn, RunResult.tscn
-      common/        ModalPanel.tscn, SteelButton.tscn, IconButton.tscn
-    fx/              DustPuff.tscn, Sparks.tscn, DamageNumber.tscn
-  scripts/
-    ui/  cards/  board/  fx/  data/
+    card_state.gdshader
 ```
 
-## Scene Tree: Main Run Screen
+## Main Scene Tree
 
 ```text
 Main (Node)
- |- Tabletop (Node2D)                      world space, zoomable
- |   |- BoardCamera (Camera2D)             zoom 0.80 to 1.25, pan limits = tabletop bounds + 240 px
- |   |- FieldBackground (Node2D)           tiles + decals (layer 1 to 2)
- |   |- CardGround (Node2D)                fixed buildings (layer 3)
- |   |- CardWorld (Node2D)                 stacks (layer 4), y-sort off, z managed by script
- |   |- CardTransient (Node2D)             held or arriving cards (layer 5)
- |   |- FieldFx (Node2D)                   particles and damage numbers (layer 6)
- |- HudLayer (CanvasLayer, layer 10)       not affected by the camera
- |   |- SafeArea (Control, 1920 x 1080 centered)
- |       |- TopBar
- |       |- BottomTray
- |       |- ToastStack
- |       |- OffscreenMarkers
- |- OverlayLayer (CanvasLayer, layer 20)   pause, modal, inspect, settings
- |- CursorLayer (CanvasLayer, layer 30)    custom cursor and drag ghost if needed
+ |- World (Node2D)
+ |   |- BoardCamera (Camera2D)
+ |   |- Terrain (TileMapLayer)
+ |   |- Props (Node2D)
+ |   |- Board (Node2D)                 board plate, rail, slot band; also the play-area rectangle
+ |   |- Cards (Node2D)                 all stacks; draw order set by script
+ |   |- Held (Node2D)                  cards being dragged or in flight
+ |   |- Fx (Node2D)
+ |- HudLayer (CanvasLayer, layer 10)
+ |   |- Root (Control, 960 x 540 UI px)
+ |       |- ListPanel  |- InfoPanel  |- ResourceBox  |- TimeBox  |- PausedLabel
+ |- MenuLayer (CanvasLayer, layer 20)
 ```
 
-Cards are `Node2D`-rooted scenes in world space (so the camera zoom scales them), but their internal layout uses `Control` children with a fixed 180 x 252 root. The Tabletop camera zoom must not affect HUD layers.
-
-## Card.tscn Structure
+## Card.tscn
 
 ```text
-Card (Node2D)                    script: card_view.gd
- |- Shadow (Sprite2D)
- |- Body (Control, 180 x 252, pivot at center)
-     |- Frame (NinePatchRect)
-     |- Art (TextureRect, clip)       material: card_state.gdshader
-     |- ArtOverlay (TextureRect)
-     |- Wear (TextureRect)
-     |- Header (HBoxContainer)
-     |   |- CategoryTab (TextureRect)
-     |   |- Title (Label)
-     |   |- CornerSlot (TextureRect)
-     |- TypeLine (Label)
-     |- InfoPanel (PanelContainer)
-     |   |- InfoLabel / Progress / Pips
-     |- Footer (Control)
-     |   |- BadgeLeft  |- Rail  |- BadgeRight
-     |- StateOutline (Control, custom _draw)
- |- HitArea (Area2D + CollisionShape2D 192 x 264)
+Card (Node2D)                       card_view.gd; origin = top-left corner of the card
+ |- Shadow (ColorRect 48 x 56, ink 45%)
+ |- Body (Node2D)                   moved up for hover/drag lift
+     |- Frame (Sprite2D)            material: card_state.gdshader
+     |- Icon (Sprite2D)
+     |- Title (Label, font.card)
+     |- BadgeLeft (Node2D)  |- BadgeRight (Node2D)
+     |- NewDot (Sprite2D)
+     |- Outline (Sprite2D)          cyan / red state outline
 ```
 
-Scale, tilt, and lift animate `Body` and `Shadow`, never the root. This keeps the logical card position stable for layout and snapping.
+- Put the card's origin at its top-left corner and keep all child offsets whole numbers.
+- Lift moves `Body`; the `Shadow` stays put and gets a bigger offset. The card's logical position never changes during lift.
+- `card_state.gdshader`: white flash (mix to white), and palette swap to the steel ramp for the disabled state.
 
-## Resources
-
-### `CardFamilyStyle` (Resource), one `.tres` per family
-
-```gdscript
-class_name CardFamilyStyle
-extends Resource
-
-@export var family_id: StringName          # &"vehicle", &"enemy", &"searchable", &"event", &"fixed_building", &"equipment"
-@export var frame_texture: Texture2D
-@export var back_texture: Texture2D
-@export var tab_texture: Texture2D
-@export var rail_texture: Texture2D
-@export var accent_color: Color
-@export var frame_margins: Vector4i = Vector4i(24, 24, 24, 24)   # nine-slice at 2x
-@export var art_breakout_px: int = 0       # enemies: 10
-@export var shadow_scale: float = 1.0      # fixed buildings: 0.7 (tighter)
-@export var can_lift: bool = true          # fixed buildings: gameplay may override
-```
-
-### `CardStyleLibrary` (Resource)
-
-A dictionary from `family_id` to `CardFamilyStyle`, plus shared textures (wear masks, badge plates, glyphs).
-
-### `MotionTokens` (Resource)
-
-Exposes every motion token from [02 Design Tokens](02-design-tokens.md) as exported floats and `Tween.TransitionType` / `Tween.EaseType` pairs, plus a `reduced_motion: bool` that the settings screen toggles. All animation code reads from here; no durations are hardcoded.
-
-### `CardPresentationData` (Resource or plain data)
-
-The minimal contract between future gameplay data and the card view:
+## Card Data
 
 ```gdscript
-class_name CardPresentationData
+class_name CardData
 extends Resource
 
-@export var card_id: StringName
-@export var family_id: StringName
-@export var title: String
-@export var type_line: String
-@export var art: Texture2D
-@export var info_text: String = ""
-@export var badge_left: String = ""        # empty = hidden
-@export var badge_right: String = ""
-@export var badge_left_style: StringName = &"primary"   # primary | secondary | threat
+enum Family { VEHICLE, ENEMY, SEARCHABLE, EVENT, FIXED_BUILDING, EQUIPMENT }
+
+@export var id: StringName          # matches icon file name: card_icon_<family>_<id>.png
+@export var family: Family
+@export var title: String           # short: max 4 CJK characters / about 8 Latin letters
+@export var full_name: String       # shown in the info panel
+@export_multiline var description: String
+@export var icon: Texture2D
+@export var badge_left: int = -1    # -1 = hidden
+@export var badge_right: int = -1
 @export var grade: StringName = &"standard"
 ```
 
-Runtime state (selected, busy progress, damaged, disabled, new) is set on the view through methods such as `set_state()` and `set_progress()`, not stored in this resource.
+Gameplay fields are added later. The view only reads these.
 
-### Theme (`ui_theme.tres`)
+`CardFamilyStyle` resources (one per family) hold the frame, back, flip strip and title color, so the view never branches on family in code.
 
-Define type variations for `SteelButtonPrimary`, `SteelButtonSecondary`, `SteelButtonDanger`, `PanelSteel`, `PanelInset`, `LabelDisplayLg`, `LabelDisplayMd`, `LabelUiMd`, `LabelUiSm`, and `LabelBadge`. Colors, fonts, and StyleBoxes come from the tokens; controls reference type variations, never inline overrides.
+## Scripts
 
-## Scripts (Responsibilities)
-
-| Script | Responsibility |
+| Script | Job |
 | --- | --- |
-| `card_view.gd` | Applies `CardPresentationData` + `CardFamilyStyle`; owns visual states and their tweens |
-| `card_stack_view.gd` | Cascade layout (`offset.stack`), count plate, hover fan |
-| `drag_controller.gd` | Pointer and controller grab, drag, drop, snap target search (64 px), return, push-apart |
-| `board_camera.gd` | Zoom clamp and step, pointer-centered zoom, pan, event nudge |
-| `motion.gd` (autoload) | Helper functions: `lift()`, `settle()`, `shake()`, `pop()`, `flip()`; they honor reduced motion |
-| `fx_spawner.gd` | Pools particles and damage numbers |
-| `hud_*.gd` | Binds HUD widgets to game state signals |
-| `ui_focus.gd` | Default focus, back navigation, focus restoration after modals |
+| `card_view.gd` | Shows a `CardData`; states (hover, held, outline, flash, disabled, new) |
+| `card_stack.gd` | Keeps the list of cards, lays them out 12 px apart, shows timer bar and count |
+| `drag_controller.gd` | Press, click-or-drag, pan-or-drag, drop target search (24 px), return to play area |
+| `repel.gd` | Pushes overlapping root cards apart each physics frame, scaled by mass |
+| `board_camera.gd` | Zoom toward cursor, pan, clamp, event nudge |
+| `motion.gd` (autoload) | Shared tweens: lift, land, arc launch, bump, shake. Reads motion tokens and the reduced-motion setting. |
+| `settings.gd` (autoload) | Saves and loads settings |
 
-Gameplay code emits signals (`card_attacked`, `search_completed`, `event_arrived`, and so on). The presentation layer listens and plays the choreography from [06 Interaction and Motion](06-interaction-motion.md). Gameplay never calls tweens directly.
+Gameplay sends signals (`card_spawned`, `attack`, `card_destroyed`, `event_arrived`...). The view reacts with the animations in [06 Interaction and Motion](06-interaction-motion.md). Gameplay code never runs tweens.
 
-## Performance Notes
+## Performance
 
-- Target 60 FPS with 150 cards on the board on mid-range hardware.
-- Pool particle and damage-number nodes.
-- Keep per-card shaders to one material; share a single `ShaderMaterial` where parameters are identical and use instance uniforms for per-card values.
-- Card tooltips and inspect views are single shared instances that are repositioned, not created per card.
+- Target: 60 FPS with 200 cards on the board.
+- Push check runs per root card per frame and stops at the first valid overlap, as in the engine. Use a spatial grid (cells of 64 x 64 art px) so 200 cards do not test every pair.
+- Pool damage numbers, dust and sparks.
+- One shared `ShaderMaterial` for all cards; per-card values through instance uniforms.

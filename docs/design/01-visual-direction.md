@@ -2,91 +2,67 @@
 
 ## Tone
 
-Iron Horizon is harsh but not monochrome. It is the visual language of a convoy maintained with scavenged parts: sun-bleached paint, welded repairs, scorched exhaust, dust trapped in seams, and small points of deliberate light. The tabletop feels dependable enough to command from, even when the world beyond it is not.
+A convoy kept alive with scavenged parts: sun-bleached paint, rusted plates, welded repairs, dust in every seam. The board is the commander's steel deck plate. Around it lies the wasteland: dunes, dead trees, wrecked cars, tire piles, broken pylons.
 
-The target is illustrated industrial realism, not photorealism. Forms are simplified into clear planes and silhouettes so every card reads at tabletop scale.
+Stacklands pairs a calm, light board with a busy illustrated world around it. Keep that structure. Swap the soft green meadow for a warm, dusty wasteland and a cool gray steel board.
 
-## Material Hierarchy
+## Pixel-Art Rules
 
-| Layer | Purpose | Treatment |
+1. **Palette**: use only the 32 colors in [02 Design Tokens](02-design-tokens.md). Transparency is on or off; the only exceptions are the shadow and overlay tokens.
+2. **Outlines**: every card and interactive object has a 1 px `ink` outline. Props in the world may use selective outlines (a darker shade of their own ramp) so they sit behind the cards visually.
+3. **No mixels**: never scale or rotate an individual sprite. Zoom is the only scaling, and it applies to the whole world at once. Animation uses translation, frame swaps and palette flashes.
+4. **Shading**: 3 to 4 shades per material. Light comes from the top left. No pillow shading (light in the middle, dark all around).
+5. **Anti-aliasing**: manual only, on curves in large sprites (48 px or bigger). None in icons 32 px or smaller.
+6. **Dithering**: only on large, flat areas (terrain, sky in key art, board plate wear). Never inside card icons.
+7. **Clusters**: avoid single isolated pixels ("pixel noise"), except deliberate highlights like a headlamp glint or rivet.
+8. **Resting positions**: cards at rest snap to whole art pixels so they stay crisp (see [06 Interaction and Motion](06-interaction-motion.md)).
+
+## Materials
+
+| Material | Ramp | Notes |
 | --- | --- | --- |
-| Field surface | Playable tabletop | Dusty charcoal plates, seams, faded stencils, sparse bolt lines |
-| Card outer frame | Object identity and durability | Dark gunmetal with 1 px edge light and category accent insert |
-| Card inset | Information surface | Near-black enamel or dark canvas; flatter and calmer than the frame |
-| Art window | Category image | Matte painted illustration with a controlled film-grain pass |
-| Data plates | Functional labels and badges | Pale enamel, brass/amber marker, or stamped steel; no glassy pills |
-| Urgency layer | Danger, heat, new event | Localized amber/red glow, not a full-card color wash |
+| Steel (board, frames, vehicles) | `steel.1` to `steel.7` | Cool gray; rivets are 1 px highlight + 1 px shadow |
+| Rust | `rust.0` to `rust.4` | On edges and bolts of old metal; also the enemy color family |
+| Sand and dust | `sand.0` to `sand.4` | World terrain, dust particles |
+| Paint: cyan | `cyan.0` to `cyan.3` | Player-owned vehicles, focus, friendly UI |
+| Paint: amber | `amber.0` to `amber.3` | Events, actions, heat, timers |
+| Paint: olive | `olive.0` to `olive.2` | Searchable buildings and military surplus |
+| Enamel / bone | `bone`, `white` | Labels, equipment, light text |
+| Hazard yellow | `hazard` | Equipment stripes, warning marks |
 
-Wear must follow form: edge chipping at corners, horizontal dust along lower edges, soot around vents, and scratches near handles or mount points. Keep the title bar, icons, and value badges free of destructive texture.
+## Board Look
 
-## Color Roles
+- Base: `steel.6` deck plate, tiled from a 16 x 16 pattern with faint `steel.5` diamond tread.
+- Plate seams every 64 art px, like large deck panels: a 1 px `steel.5` line with a 1 px `steel.7` highlight below it.
+- Sparse wear: small rust spots (`rust.1`, 2 to 4 px), dust along the bottom edge, a few faded stencil numbers in `steel.4`.
+- Rail: 3 px border around the board: `ink`, `steel.7`, `steel.4` (outside to inside). This replaces Stacklands' white rounded outline.
+- Keep the board calm: wear marks cover less than 5% of its area. Cards must be the busiest thing on it.
 
-Color values live in [02 Design Tokens](02-design-tokens.md). Their meaning is fixed here.
+## World Look (Outside the Board)
 
-- Coal and graphite establish the board, card frame, and modal foundation.
-- Bone enamel provides readable labels and strongest text.
-- Industrial cyan marks player ownership, selected-object focus, and system navigation.
-- Signal amber marks action readiness, power, heat, and attention requiring a decision.
-- Field olive marks neutral locations, systems, and search-ready state.
-- Threat red marks hostile identity, damage, and irreversible warnings.
-- Dust beige belongs only to environmental texture and secondary dividers; it must not become the dominant UI surface.
+- Terrain: base `sand.2`, shadows `sand.1`, highlights `sand.3`; 16 x 16 tiles with dithered transitions, cracked earth, tire tracks.
+- Props: wrecked cars, oil drums, dead trees, bones, tire piles, broken pylons, sandbag walls. Mostly 16 to 64 px.
+- Ambient life, like Stacklands' cows and geese: vultures circling, a tumbleweed rolling, a scavenger dog, dust devils. At most 4 animated at once, 4 to 6 frame loops at 8 fps.
+- The world is darker and warmer than the board, so the board always reads as the focus.
 
-Never encode category or critical status by color alone. Pair each color role with a distinct tab profile, icon, border treatment, or label.
+## Card Art (Icons)
 
-## Illustration Rules
+Each card shows a central icon, like Stacklands. Ours are small pixel illustrations instead of line drawings.
 
-Each card illustration uses a three-value composition:
+- Size: up to 32 x 26 art px, centered in the card's art area.
+- One subject, readable as a silhouette in pure `ink` on the card body color.
+- Vehicles: side or 3/4 view, wheels and weapon clearly separated.
+- Enemies: facing the viewer or charging; aggressive, uneven silhouette.
+- Buildings: front view, entrance clearly visible.
+- Events: a symbol (radio mast, storm cloud, flare, crate on a parachute).
+- Equipment: a single object (gun, armor plate, engine, drill).
 
-1. A dark environmental mass for depth.
-2. A readable midtone subject silhouette.
-3. A selective high-value edge, headlamp, metal reflection, or dust break that points toward the title and badges.
+## Text
 
-The subject occupies 55% to 70% of the art window. Keep horizon lines in the upper third or omit them. Avoid tiny debris fields, busy settlements, wide cinematic skies, and detailed figures at this scale.
+Text uses pixel fonts that support Chinese (see [02 Design Tokens](02-design-tokens.md)). Never smooth or scale text by non-integer factors in the UI. In the world, text scales with zoom like everything else.
 
-### Subject Direction
+## Accessibility
 
-- Vehicles: 3/4 angle, low camera, one dominant chassis, visible wheel/tread mass, identifiable weapon or utility profile.
-- Enemies: confrontational angle or abrupt intrusion, stronger contrast around the threat-facing edge, uneven or improvised silhouette.
-- Searchable buildings: one clear facade, breach point, door, loot hatch, or antenna; scene remains quieter than vehicle art.
-- Events: graphic symbol plus a single environmental cue such as a sand plume, flare, radio mast, or blackout stripe.
-- Fixed buildings: grounded, low-center composition with foundation, pipes, gantry, or defensive wall visibly contacting the lower edge.
-- Equipment: product-like object portrait on dark technical backdrop; one physical mount, cable, casing, or tool head makes function plausible.
-
-## Typography
-
-Use two families when production begins.
-
-- Display: a condensed, squared industrial face for card names, section labels, and numerals. Use all caps sparingly for major labels and never letter-space text negatively.
-- Interface: a high-legibility neutral sans for descriptions, menus, tooltips, and accessibility-sensitive values.
-
-Names use compact upper/lower title case where local writing allows it. Avoid long all-caps strings inside cards. Text hierarchy and exact sizes are defined in [02 Design Tokens](02-design-tokens.md).
-
-## Icons and Marks
-
-Use simple, solid, familiar pictograms with a 2 px visual stroke at card scale: wheel, reticle, shield plate, fuel can, wrench, radio mast, crate, tower, warning triangle, and skull-like threat marker only when thematically appropriate. Icons sit in stamped plates or painted panels; they never float as glossy rounded rectangles.
-
-Create category marks with both shape and color distinction:
-
-- Vehicle: horizontal cyan rail and tread notch.
-- Enemy: jagged red tab and broken edge.
-- Searchable: olive locator tag with keyed notch.
-- Event: torn dispatch band.
-- Fixed building: broad low rivet plate.
-- Equipment: narrow yellow technical stripe.
-
-## Texture and Lighting
-
-Texture overlays should be subtle: 3% to 8% opacity for grain, 6% to 14% for dust masks, and no more than 18% for localized wear. Use multiply-like dark dirt only on broad background surfaces; artwork maintains its intended value hierarchy.
-
-Global lighting is late-afternoon hard light filtered through dust. Cyan is emissive only for owned-system indicators. Amber and red emit softly from a local source, with no full-screen neon bloom.
-
-## Contrast and Accessibility
-
-- Standard body text on dark surfaces targets at least 4.5:1 contrast.
-- Large display text targets at least 3:1 contrast.
-- Selected state combines cyan color, 2 px outline, and a corner-bracket icon.
-- Damage combines threat red, fractured border segment, and a damage mark icon.
-- Searchable state combines olive, locator tag, and an open/closed hatch pictogram.
-- Reserve continuous pulsing for one urgent item at a time; use a 2.2 s cycle at most.
-
-See [10 Validation Checklist](10-validation-checklist.md) for visual review criteria.
+- Card title text meets 4.5:1 contrast against its card body (checked in [02 Design Tokens](02-design-tokens.md)).
+- Each card family is identifiable without color, from its silhouette cue (see [05 Card Families](05-card-families.md)).
+- No flashes faster than 3 per second. Hit flashes are 2 frames once.

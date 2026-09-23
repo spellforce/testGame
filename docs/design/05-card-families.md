@@ -1,86 +1,78 @@
 # Card Families
 
-All families share the 180 x 252 px footprint and anatomy from [04 Card System](04-card-system.md). Each family differs in category tab, frame accent, rail, art direction, and card back. A player should identify any family at 0.80x zoom from shape cues alone, without color.
+All families use the anatomy in [04 Card System](04-card-system.md). They differ in body color, one **shape cue** (so they can be told apart without color), icon style and card back.
 
-## Summary Matrix
+Stacklands tells card types apart mostly by body color (cream for villagers, dark gray for resources). We do the same and add a shape cue.
 
-| Family | Tab shape | Accent token | Frame accent | Footer rail | Behavior class |
-| --- | --- | --- | --- | --- | --- |
-| Vehicle | Rectangle with tread notch | `accent.cyan` | Heavy lower fender plate | Horizontal cyan rail | Movable, player-owned |
-| Enemy | Jagged downward tab | `state.threat` | Asymmetric chipped frame | Broken red dash rail | Movable, hostile |
-| Searchable building | Tag with keyed notch | `accent.olive` | Locator bolt at each top corner | Olive hatch rail | Usually stationary, interactable |
-| Event | Torn dispatch strip across full top | `accent.amber` | Torn paper upper edge | None (dispatch band replaces it) | Transient |
-| Fixed building | Broad low plate | `line.steel` + `material.bone` | Riveted thick base, 12 px | Rivet row | Stationary, placed |
-| Equipment | Narrow vertical strip at left edge | `accent.yellow` | Thin technical frame, mount notches | Yellow/black hazard ticks | Attachable |
+## Summary
+
+| Family | Body ramp (base / shade / highlight) | Title color | Shape cue |
+| --- | --- | --- | --- |
+| Vehicle | `cyan.1` / `cyan.0` / `cyan.2` | `white` | Wheel notches: 2 notches (3 x 2 px) cut into the bottom outline |
+| Enemy | `rust.2` / `rust.1` / `rust.3` | `white` | Jagged header: 3 small teeth along the header's bottom edge |
+| Searchable building | `olive.1` / `olive.0` / `olive.2` | `white` | Keyhole: 3 x 5 px keyhole mark in the footer center |
+| Event | `amber.2` / `amber.1` / `amber.3` | `ink` | Torn top: header's top edge is a zigzag (1 px steps) |
+| Fixed building | `steel.2` / `steel.1` / `steel.3` | `white` | Bolts: 4 rivets (2 x 2 px `steel.7`) at the art area's corners |
+| Equipment | `bone` / `steel.7` / `white` | `ink` | Hazard stripe: 4 px diagonal `hazard` / `ink` stripe along the left edge of the art area |
 
 ## Vehicle
 
-- **Identity**: the player's convoy. Must feel sturdy, owned, and ready.
-- **Frame**: standard 8 px steel frame, lower 16 px becomes a heavier fender plate with two bolt heads. Cyan 3 px ownership rail across the footer center.
-- **Tab**: 24 x 20 px cyan rectangle with a small tread notch cut from its lower edge. Icon: wheel or chassis silhouette.
-- **Art**: low 3/4 angle, chassis fills 60% to 70% of art window, headlamp or weapon catches light. Background: dusty plain in muted olive/beige, low horizon.
-- **Title plate**: pale serial stencil option (e.g., small `MK-II`-style suffix in `type.ui.xs` next to the name) supported but optional.
-- **Distinct states**: selected/owned glow in cyan; damaged state adds persistent frame scratches and a smoke wisp overlay on art (optional art layer).
-- **Card back**: dark steel with cyan convoy emblem (stylized wheel inside a shield).
+- **Role**: the player's convoy units.
+- **Icon**: side or 3/4 view, wheels or tracks clearly separate from the body. Headlamp glint in `amber.3` (1 to 2 px).
+- **Footer**: wheel notches in the bottom outline, between the two badges.
+- **Card back**: `cyan.1` with a wheel-in-shield emblem.
 
 ## Enemy
 
-- **Identity**: hostile raiders, drones, mutated machines. Immediately threatening.
-- **Frame**: same steel frame with one or two chipped/broken segments (fixed per art, not random each frame). Upper-right corner has a 10 px notch cut.
-- **Tab**: jagged red tab hanging down 4 px lower than other families. Icon: reticle or threat mark.
-- **Art**: confrontational angle, subject faces or charges the viewer, stronger contrast and rim light. Subject may break the art-window upper edge by up to 10 px.
-- **Footer**: broken red dash rail; left badge defaults to threat-style chipped plate.
-- **Distinct states**: aggressive/attacking uses an amber-red corner pulse (`motion.loop`), only for the most urgent enemy.
-- **Card back**: rust-red emblem of a crossed reticle on scorched steel.
+- **Role**: raiders, drones, mutated machines.
+- **Icon**: faces the viewer or charges, uneven silhouette, a single `amber.3` or `white` eye/light pixel cluster.
+- **Header**: 3 teeth pointing down from the header into the separator row.
+- **Card back**: `rust.2` with a crossed-reticle emblem.
+- **Extra**: the right badge (health in most designs) uses the `rust.2` plate by default. On an enemy it switches to a `steel.2` plate so it stays visible against the red body.
 
 ## Searchable Building
 
-- **Identity**: ruins, wrecks, depots, and bunkers that can be explored or looted.
-- **Frame**: steel frame with a small olive locator bolt at each top corner.
-- **Tab**: olive tag shape with a keyed notch on the right side. Icon: crate, hatch, or magnifier-style scanner.
-- **Art**: single facade or wreck, clear point of entry (door, hatch, breach). Quieter value range than vehicles and enemies.
-- **Info panel**: search progress bar (amber) or remaining-search pips (up to 5, 8 px each).
-- **Distinct states**: `sealed` (hatch icon closed), `searching` (progress bar fills, dust particles at base), `depleted` (art desaturated 60%, hatch icon open and empty).
-- **Card back**: olive-gray with stenciled grid coordinates and a hatch emblem.
+- **Role**: ruins, wrecks, depots and bunkers to explore.
+- **Icon**: front view with a clear entrance (door, hatch, breach).
+- **Footer**: keyhole cue in the center.
+- **States**: a sealed one shows the keyhole in `ink`; searching shows the timer bar; emptied swaps to the steel ramp (the disabled state).
+- **Card back**: `olive.1` with a crate emblem.
 
 ## Event
 
-- **Identity**: storms, radio signals, ambushes, supply drops. Temporary and attention-grabbing.
-- **Frame**: upper edge is a torn dispatch band spanning full card width (the tab is integrated into this band). Band color `accent.amber` with dark stencil text.
-- **Art**: graphic, high-contrast composition — a large central symbol plus one environmental cue. More poster-like than other families.
-- **Footer**: no rail; may show a countdown badge.
-- **Distinct states**: arrival (see motion doc) and expiry countdown via corner radial timer.
-- **Card back**: amber-and-charcoal hazard-striped back with a radio mast emblem. Events are often revealed from this back with a flip.
+- **Role**: storms, radio signals, ambushes, supply drops. Usually temporary.
+- **Icon**: symbol-like, strong silhouette (radio mast, storm cloud, flare, parachute crate).
+- **Header**: torn zigzag top edge.
+- **Timer**: an event with a countdown shows the timer bar.
+- **Arrival**: lands face down and flips (see [06 Interaction and Motion](06-interaction-motion.md)).
+- **Card back**: `amber.2` with `ink` diagonal hazard stripes and a radio-mast emblem.
 
 ## Fixed Building
 
-- **Identity**: player-constructed or permanent structures: garage, turret, workshop, fuel depot.
-- **Frame**: heavier base; lower 12 px is a thick riveted plate with 5 visible rivets, visually "bolted to the table".
-- **Tab**: broad, low 36 x 14 px plate in `material.bone` with a dark icon. Icon: wrench, tower, or tank silhouette.
-- **Art**: low center of mass, structure touches the lower art-window edge, pipes/gantries/walls give grounding.
-- **Shadow**: uses a tighter, darker contact shadow than other cards (they do not lift as high).
-- **Behavior presentation**: can be dragged only if gameplay allows; when locked, drag attempts show a small 3 px shake and lock glyph.
-- **Card back**: rarely seen; bone-and-steel blueprint pattern.
+- **Role**: garage, turret, workshop, fuel depot.
+- **Icon**: front view, wide at the bottom (grounded).
+- **Cue**: 4 rivets in the art area corners.
+- **Behavior**: draggable only if gameplay allows. A locked building that is grabbed shakes 1 px left-right twice and shows a 5 x 5 lock icon.
+- **Card back**: rarely shown; `steel.2` with a blueprint grid.
 
 ## Equipment
 
-- **Identity**: weapons, armor plates, engines, scanners attached to vehicles.
-- **Frame**: thinner 6 px technical frame; left edge carries a 10 px vertical yellow strip with two mount notches.
-- **Tab**: integrated into the left strip. Icon: bolt, gun barrel, plate, or gear.
-- **Art**: object portrait on dark technical backdrop, subtle blueprint grid at 6% opacity.
-- **Footer**: yellow/black hazard tick rail; badges show equipment stats.
-- **Attachment presentation**: when attached to a vehicle, the card sits behind the vehicle with its header and left strip visible (28 px offset per [03 Tabletop Layout](03-tabletop-layout.md)). A cyan connector tick links host and equipment.
-- **Card back**: yellow-and-steel crate stencil.
+- **Role**: guns, armor plates, engines, scanners.
+- **Icon**: single object, side view.
+- **Cue**: diagonal hazard stripe on the left edge of the art area.
+- **Attached**: equipment joins a vehicle stack like any card (it stacks under the vehicle, 12 px offset). Gameplay decides where in the stack it may go.
+- **Card back**: `bone` with a toolbox emblem.
 
-## Grades / Rarity (Optional Hook)
+## Grades (Optional)
 
-If future design needs grades, express them with a frame edge insert only:
+If gameplay needs rarity or grades, show them with the outline only. Never change size or body color.
 
-| Grade | Treatment |
+| Grade | Outline |
 | --- | --- |
-| Standard | No insert |
-| Refitted | 1 px `material.bone` inner line |
-| Military | 1 px `accent.amber` inner line + corner rivets |
-| Prototype | 1 px `accent.cyan` inner line + subtle scanline overlay at 5% |
+| Standard | `ink` |
+| Rare | `ink` with a second 1 px `amber.3` line inside it, top edge only |
+| Prototype | `ink` with the inner line in `cyan.3`, full border |
 
-Do not change card size or family color based on grade.
+## Checking Families Without Color
+
+Convert a screenshot of all six families to grayscale. Each must still be recognizable from its shape cue alone at 1 screen px per art px.
