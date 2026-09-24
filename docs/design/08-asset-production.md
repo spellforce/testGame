@@ -13,7 +13,7 @@
 | --- | --- | --- | --- |
 | Card frame, per family | 48 x 56 | 1 | Body, outline, separator, shape cue. No title or icon. |
 | Card back, per family | 48 x 56 | 1 | Includes the 24 x 24 emblem |
-| Card icons | up to 32 x 26 | 1 (2 to 4 for animated idle, optional) | One per card, transparent background |
+| Card icons | up to 32 x 20 (20 x 24 for tall subjects) | 1 (2 to 4 for animated idle, optional) | One per card, transparent background. See **E2** in [20 Questions and Errata](20-questions-and-errata.md) |
 | Badge plates | 13 x 9 | 1 | Bone, red, steel |
 | Badge icons | 5 x 5 | 1 | Heart, coin, bolt, fuel, lock |
 | Digit fonts | 3 x 5 and 5 x 7 per glyph | --- | 0 to 9, +, -, /; as a sprite font |
@@ -61,7 +61,7 @@ So a new card needs just one 32 x 26 icon and one line of data.
 - [ ] Light from the top left, 3 to 4 shades.
 - [ ] No dithering, no isolated noise pixels.
 - [ ] Contrasts with its family's body color (check vehicles on `cyan.1`, not on white).
-- [ ] Fits in 32 x 26, visually centered (a wide vehicle can be 32 x 18).
+- [ ] Fits in 32 x 20 (or 20 x 24 if tall), visually centered.
 
 ## Naming
 

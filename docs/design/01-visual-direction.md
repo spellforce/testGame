@@ -49,7 +49,7 @@ Stacklands pairs a calm, light board with a busy illustrated world around it. Ke
 
 Each card shows a central icon, like Stacklands. Ours are small pixel illustrations instead of line drawings.
 
-- Size: up to 32 x 26 art px, centered in the card's art area.
+- Size: up to 32 x 20 art px, centered in the card's 46 x 29 art area. Tall subjects (a mast, a standing figure) may use 20 x 24. See **E1** and **E2** in [20 Questions and Errata](20-questions-and-errata.md) — the earlier 32 x 26 budget does not fit.
 - One subject, readable as a silhouette in pure `ink` on the card body color.
 - Vehicles: side or 3/4 view, wheels and weapon clearly separated.
 - Enemies: facing the viewer or charging; aggressive, uneven silhouette.

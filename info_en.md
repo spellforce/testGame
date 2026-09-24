@@ -155,7 +155,7 @@ The card types explicitly covered by the current document are as follows. Counte
 
 Drop sources are mainly: region cards generate initial content; location cards generate items, equipment, monsters, or new locations; monster deaths generate loot.
 
-## 8. Content Needing Design
+# Content Needing Design
 
 ### Pop-up Design
 

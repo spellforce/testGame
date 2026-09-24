@@ -5,9 +5,9 @@ Check these when reviewing art, the first Godot build, and every new batch.
 ## Numbers
 
 - [ ] Card rows add up to 56: 1 + 12 + 1 + 29 + 12 + 1. Columns add up to 48: 1 + 46 + 1.
-- [ ] Card ratio is 48 : 56 (1 : 1.18), matching the engine collider 0.42 x 0.495 units.
 - [ ] Board is 1104 x 644 art px (23 cards wide, 11.5 cards tall; ratio 1.714).
-- [ ] Slot band: 14 + 81 + 9 = 104. Pack slots are 60 x 81 art px.
+- [ ] Slot band: 14 + 81 + 9 + 48 + 12 = 164, and the divider sits at y 164 (**E3** in [20 Questions and Errata](20-questions-and-errata.md)). Pack slots are 60 x 81, skill tray chips are 40 x 48.
+- [ ] Play area is 1104 x 480 (644 - 164).
 - [ ] 9 slots at 64 px pitch = 560 px, centered in 1104.
 - [ ] UI layout: list panel 4 + 380 + 5 + info panel 147 + 4 = 540.
 

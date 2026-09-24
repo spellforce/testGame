@@ -24,10 +24,11 @@ Stacklands' camera looks down at a slight angle, so the board is a trapezoid. Th
 |  wasteland terrain, props, ambient animals                   |  (drag empty space to pan)
 |                                                              |
 |          +------------------------------------------+        |
-|          | [sell][pk][pk][pk][pk][??][??][??][??]   | 104    |  Top slot band
+|          | [pk][pk][pk][pk][??][??][??][??][??]      | 104    |  Top slot band, row 1
+|          | [sk][sk][sk][sk][sk][sk][sk][ ][ ]      |  60    |  row 2 (skills / reserved)
 |          |------------------------------------------|        |
 |          |                                          |        |
-|          |       CARD PLAY AREA 1104 x 536          |        |  Board 1104 x 644
+|          |       CARD PLAY AREA 1104 x 480          |        |  Board 1104 x 644
 |          |                                          |        |  (23 x 11.5 cards)
 |          +------------------------------------------+        |
 |                                                              |
@@ -39,18 +40,20 @@ Stacklands' camera looks down at a slight angle, so the board is a trapezoid. Th
 | World canvas | 2208 x 1288 | Origin (0, 0) |
 | Board | 1104 x 644 | Centered: x 552 to 1656, y 322 to 966 |
 | Board rail | 3 px, inside the board bounds | --- |
-| Top slot band | 1104 x 104 | Top of the board |
-| Band divider | 2 px (`ink` + `steel.7`) | Bottom of the band |
-| Play area | 1104 x 538 (the rail sits inside this) | Below the band |
+| Top slot band | 1104 x 164 | Top of the board |
+| Band divider | 2 px (`ink` + `steel.7`) | Bottom of the band, at y 164 |
+| Play area | 1104 x 480 (the rail sits inside this) | Below the band |
+
+**Errata E3**: the band was 104 and the play area 538. The expedition's skill tray needs a second row, so the band grows to 164. Arithmetic: `14 + 81 + 9 + 48 + 12 = 164`; the play area is `644 - 164 = 480`. See [20 Questions and Errata](20-questions-and-errata.md) and [16 Garage and Expedition Boards](16-garage-and-expedition-boards.md).
 
 ### Top Slot Band
 
 Mirrors Stacklands' row of packs and the sell slot. What the slots do is a gameplay decision; this is only the layout.
 
-- 9 slots of 60 x 81, 4 px apart (64 px pitch). Row width 560 px, centered.
-- Slot top at 14 px below the board top; 9 px below the slot to the divider (14 + 81 + 9 = 104).
+- **Row 1**: 9 slots of 60 x 81, 4 px apart (64 px pitch). Row width 560 px, centered. Slot top at 14 px below the board top; 9 px below the slot to row 2.
+- **Row 2**: 40 x 48 chips at 48 px pitch, holding the expedition skill tray or the garage's reserved slots. Top at y 104, bottom at y 152, then 12 px to the divider. See [15 Context Menus and Chips](15-context-menus-and-chips.md).
 - Slot styles: active slot (dark plate, icon, price in `font.digits.small`); locked slot (`steel.2` with "???" in `font.card`).
-- New-content marker: a 7 x 7 px starburst badge overlapping the slot's top-right corner, as in Stacklands.
+- New-content marker: a 7 x 7 px starburst badge overlapping the slot's top-right corner, as in Stacklands. It applies to both rows.
 
 ### Card Bounds
 

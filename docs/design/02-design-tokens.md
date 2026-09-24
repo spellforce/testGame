@@ -101,12 +101,12 @@ World (art px): base unit 4. UI (UI px): base unit 4.
 | --- | --- |
 | `card.size` | 48 x 56 |
 | `card.header` | 12 (title row) |
-| `stack.offset` | 12 (the header stays visible) |
+| `stack.offset` | 12 (the header stays visible). **Pending E6**: a 12 px offset exactly covers the 12-row header, so the 1 px separator of every lower card is hidden. If that matters, the value is 13 and three documents change. Decide at the first art review — see [20 Questions and Errata](20-questions-and-errata.md) |
 | `board.size` | 1104 x 644 |
-| `board.slot_band` | 104 (top row of slots) |
+| `board.slot_band` | 164 (top row of slots + skill tray row) — see **E3** in [20 Questions and Errata](20-questions-and-errata.md) |
 | `world.size` | 2208 x 1288 |
 | `drop.snap_radius` | 23 (special drop zones only; stacking uses overlap) |
-| `grid.cell` | 86 x 96 (align-to-grid action) |
+| `grid.cell` | 86 x 96 (align-to-grid action; deliberately larger than a card, so aligned cards show gaps — see **E5** in [20 Questions and Errata](20-questions-and-errata.md)) |
 
 ## Motion
 

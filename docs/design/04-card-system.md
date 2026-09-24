@@ -13,17 +13,19 @@ y12  +------------------------------------------+
 y13  separator: 1 row, darker shade of the body   y13
 y14  +------------------------------------------+
      |                                          |
-     |      ART AREA 46 x 37                    |  y14-50
-     |      icon up to 32 x 26, centered        |
+     |      ART AREA 46 x 29                    |  y14-42
+     |      icon up to 32 x 20, centered        |
      |                                          |
-y50  +------------------------------------------+
-y51  | [badge L]    family cue      [badge R]   |  y51-62  FOOTER 12 rows
-y62  +------------------------------------------+
-y63  ink outline
+y42  +------------------------------------------+
+y43  | [badge L]    family cue      [badge R]   |  y43-54  FOOTER 12 rows
+y54  +------------------------------------------+
+y55  ink outline
 ```
 
-Rows add up to 64: outline 1 + header 12 + separator 1 + art 37 + footer 12 + outline 1.
+Rows add up to 56: outline 1 + header 12 + separator 1 + art 29 + footer 12 + outline 1.
 Columns add up to 48: outline 1 + content 46 + outline 1.
+
+**Errata E1**: an earlier revision of this diagram showed a 37-row art area and summed to 64, which does not fit the 48 x 56 card. The art area is **29 rows**. Icons are budgeted at **32 x 20**, not 32 x 26 (**E2**). Both corrections are recorded in [20 Questions and Errata](20-questions-and-errata.md).
 
 | Zone | Rule |
 | --- | --- |
@@ -41,8 +43,8 @@ Stacklands shows small values in the bottom corners (for example, sale value and
 
 | Badge | Position | Size | Style |
 | --- | --- | --- | --- |
-| Left | x 2, y 52 | 13 x 9 | `bone` plate, `ink` outline, `ink` digits (`font.digits.small`) |
-| Right | x 33, y 52 | 13 x 9 | `rust.2` plate, `ink` outline, `white` digits |
+| Left | x 2, y 44 | 13 x 9 | `bone` plate, `ink` outline, `ink` digits (`font.digits.small`) |
+| Right | x 33, y 44 | 13 x 9 | `rust.2` plate, `ink` outline, `white` digits |
 | Icon badge | Replaces a number with a 5 x 5 icon (heart, coin, bolt) | 13 x 9 | Same plates |
 
 Up to 2 digits per badge. Values of 100 or more show as "99".
@@ -80,7 +82,7 @@ Terms: the **root card** is the first card of a stack, highest on screen. The **
 
 - Each card placed on a stack sits 12 px (`stack.offset`) lower than the one below it, so the 12-row header of every lower card stays visible.
 - Stack height = 56 + 12 x (n - 1). A 10-card stack is 164 px, about 2.9 card heights.
-- Open decision: in Stacklands a working or equipped card shrinks to 0.8 scale, and a stack's cards shift as it grows. Scaling pixel art by 0.8 breaks the pixel grid, so these two rules conflict. Either accept soft pixels in those two cases, or keep cards at full size and show the same states with the timer bar and a 5 x 5 work icon. Decide before drawing the card frames.
+- **Closed decision (E4)**: in Stacklands a working or equipped card shrinks to 0.8 scale, and a stack's cards shift as it grows. Scaling pixel art by 0.8 breaks the pixel grid, so these two rules conflict. **Resolution: never scale.** Cards keep their size and the same states are shown with the timer bar plus a 5 x 5 `steel.7` work icon in the root card's header. See [18 Asset Additions](18-asset-additions.md) for the replacement table and [20 Questions and Errata](20-questions-and-errata.md) for the reasoning.
 - No visible limit. Above 10 cards, a count plate (`font.digits`, `steel.2` plate) appears at the right end of the root card's header.
 - Grabbing a card picks up that card and every card on top of it. Grabbing the root card moves the whole stack.
 - Drop onto a stack: when the held card's rectangle overlaps another card and that card accepts it (no distance limit). It lands on the stack's last card. See [06 Interaction and Motion](06-interaction-motion.md).

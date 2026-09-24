@@ -1,5 +1,7 @@
 # Card Families
 
+> **Partially superseded.** This document defines the look of the 6 original families. [11 Card Taxonomy](11-card-taxonomy.md) now covers **8** families, maps every gameplay card type onto one, and renames family 3 from "Searchable Building" to **Site**. Read that document for the full set and for the sub-cues inside a family. Everything below about a family's body color, title color and shape cue still stands.
+
 All families use the anatomy in [04 Card System](04-card-system.md). They differ in body color, one **shape cue** (so they can be told apart without color), icon style and card back.
 
 Stacklands tells card types apart mostly by body color (cream for villagers, dark gray for resources). We do the same and add a shape cue.
