@@ -1,0 +1,16 @@
+﻿##var	id	Key	Value
+##var			
+##type	int	string	string
+##group			
+##	index	键	值
+	1	MonsterSurviver	怪物幸存者
+	2	MoveRule	WASD移动角色
+	3	StartGame	开始游戏
+	4	MainForm.Score	分数:
+	5	MainForm.Timer	计时:
+	6	SettingForm.Setting	设置
+	7	SettingForm.Music	音乐
+	8	SettingForm.Effect	音效
+			
+			
+			
