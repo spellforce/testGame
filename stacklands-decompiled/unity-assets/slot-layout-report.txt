@@ -1,0 +1,38 @@
+Stacklands slot/layout extraction
+=================================
+
+Source
+------
+- GameScripts.dll: decompiled with ILSpy 9.1.0.7988
+- Unity object inventory: unity-object-inventory.txt
+- Install: D:\tools\platform\steam\steamapps\common\Stacklands
+
+Top pack line
+-------------
+- CreatePackLine.Distance is serialized as 0.8000000119 on every scanned PackLine.
+- CreatePackLine positions active children at index * Distance, centered around zero.
+- CreatePackLine creates one SellBox, then one BuyBoosterBox per valid board booster.
+- TotalWidth is boosters.Count * Distance + 0.375.
+- Therefore the visible count is runtime data (sell target plus the board BoosterIds), not a hard-coded skill row.
+
+Prefab measurements
+-------------------
+- BoosterPrefab local scale: 1.2, 1.2, 1.2.
+- BoosterPrefab BoxCollider size: 0.5299999 x 0.7169392 Unity units.
+- Board card GameCard collider: 0.41999999 x 0.4954661 Unity units.
+- SellBox local scale: 0.75, 0.75, 0.5; BoxCollider size: 1.0 x 1.0882025.
+
+Board geometry
+--------------
+- WorldCollider size: 8.8599997 x 5.1752887 Unity units.
+- TightWorldCollider size: 8.8599997 x 4.1605453 Unity units.
+- TightWorldCollider center z: -0.62289524.
+- Top inset from the two collider heights: 1.0147434 Unity units.
+
+Godot conversion used
+---------------------
+- Board width 1104 art px / 8.86 Unity units = 124.65 art px per Unity unit.
+- PackLine pitch: 0.8u ~= 100 art px.
+- BoosterPrefab footprint including local scale: 0.636u x 0.8603u ~= 79 x 107 art px.
+- Top band: 126 art px (rounded 1.0147u inset).
+- Skills are not rendered in this band.

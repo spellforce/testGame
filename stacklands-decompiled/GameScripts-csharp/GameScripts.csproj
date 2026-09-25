@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <AssemblyName>GameScripts</AssemblyName>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <TargetFramework>netstandard2.1</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup>
+    <LangVersion>12.0</LangVersion>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup />
+  <ItemGroup />
+  <ItemGroup>
+    <Reference Include="UnityEngine.CoreModule" />
+    <Reference Include="SokLoc" />
+    <Reference Include="Unity.Postprocessing.Runtime" />
+    <Reference Include="UnityEngine.AudioModule" />
+    <Reference Include="Unity.TextMeshPro" />
+    <Reference Include="ShapesRuntime" />
+    <Reference Include="UnityEngine.PhysicsModule" />
+    <Reference Include="UnityEngine.ParticleSystemModule" />
+    <Reference Include="Newtonsoft.Json" />
+    <Reference Include="UnityEngine.UI" />
+    <Reference Include="SokSheet" />
+    <Reference Include="UnityEngine.UnityWebRequestModule" />
+    <Reference Include="UnityEngine.UIModule" />
+    <Reference Include="Unity.InputSystem" />
+    <Reference Include="DOTween" />
+    <Reference Include="com.rlabrecque.steamworks.net" />
+    <Reference Include="UImGui" />
+    <Reference Include="ImGui.NET" />
+    <Reference Include="0Harmony" />
+    <Reference Include="UnityEngine.AssetBundleModule" />
+    <Reference Include="UnityEngine.ImageConversionModule" />
+    <Reference Include="UnityEngine.JSONSerializeModule" />
+    <Reference Include="DOTween.Modules" />
+    <Reference Include="UnityEngine.IMGUIModule" />
+    <Reference Include="UnityEngine.UnityWebRequestAudioModule" />
+  </ItemGroup>
+</Project>
