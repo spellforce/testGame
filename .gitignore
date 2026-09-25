@@ -2,3 +2,6 @@
 .godot/
 /android/
 Godot/GodotProject/.vscode
+
+# 设计校验产物（卡框对照图等），不入库
+Godot/GodotProject/.debug/

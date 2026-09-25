@@ -5632,3 +5632,9 @@ Godot/GodotProject/TheGame/MainPack/Scripts/Procedure/ProcedurePrelode.cs
 Godot/GodotProject/TheGame/MainPack/Scripts/UI/LoadingForm.Logic.cs
 ---
 
+## Session End: 20260925_105619
+### Uncommitted Changes
+.gitignore
+Godot/GodotProject/project.godot
+---
+
