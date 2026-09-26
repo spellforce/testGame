@@ -86,7 +86,18 @@ This is a 1 px change, and it is exactly the kind of 1 px that is invisible in a
 
 **Resolution**: the cell is **20 x 16 UI px**, matching the mount grid's slot cell so one asset serves both. Corrected in [12 Vehicle Card Face](12-vehicle-card-face.md).
 
-## Questions
+### E8 — Reference camera model is perspective 3D, not a card-size change
+
+The reference capture has a board whose projected top and bottom edges differ in width, while the cards remain readable rectangular faces. The decompiled Stacklands code also uses a camera-height zoom and camera-facing card rotations. The correct interpretation is a perspective ground surface plus billboard cards, not a request to enlarge the native card asset from 48 x 56.
+
+**Resolution**: keep the design card footprint at **48 x 56 art px** and treat that as 100% prefab scale (`scale = 1`). Keep the current 2D renderer as a rollback baseline, then prototype a `Camera3D`/billboard renderer. Promote it to production only after projected-geometry, input, depth, and performance checks pass. The implementation sequence is in [game-update.md](game-update.md).
+
+### E9 — Camera calibration must be measured before changing zoom tokens
+
+The measured 25 wheel steps and the min/initial/max screenshots are useful calibration evidence, but they do not by themselves determine a 3D camera's FOV, pitch, or height range. Card screen size is not a safe proxy because cards face the camera and their capture bounds include outlines/shadows.
+
+**Resolution**: do not change card dimensions, per-card scale, or named zoom tokens to compensate for an uncalibrated camera. Record the 3D camera's pitch, FOV, height range, cursor anchoring, and projected board corners in a prototype capture, then update the tokens in a separate approved change.
+
 
 Ordered by how much design is blocked. Q1-Q4 should be answered before the art batch in [18 Asset Additions](18-asset-additions.md) step 5, because they can change the card faces.
 
@@ -177,3 +188,8 @@ The following source documents carry corrections from this list. Each has an inl
 | [08 Asset Production](08-asset-production.md) | E2 — icon budget |
 | [10 Validation Checklist](10-validation-checklist.md) | E3 — band arithmetic; E1 already correct |
 | [12 Vehicle Card Face](12-vehicle-card-face.md) | E7 — equipment row cell 20 x 16 |
+| [03 Canvas and Layout](03-canvas-layout.md) | E8/E9 — perspective reference and camera calibration gate |
+| [04 Card System](04-card-system.md) | E8 — native 48 x 56 prefab and billboard option |
+| [06 Interaction and Motion](06-interaction-motion.md) | E8/E9 — logical coordinates and 3D ray-plane input |
+| [09 Godot Handoff](09-godot-handoff.md) | E8/E9 — 2D baseline plus 3D prototype |
+| [10 Validation Checklist](10-validation-checklist.md) | E8/E9 — 3D camera acceptance checks |

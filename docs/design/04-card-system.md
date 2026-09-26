@@ -1,6 +1,8 @@
 # Card System
 
-All six card types share one 48 x 56 art px footprint, so stacking, dragging and hit testing work the same for every card.
+All six card types share one 48 x 56 art px footprint, so stacking, dragging and hit testing work the same for every card. This is also the prefab's 100% native size: use a 48 x 56 art-pixel asset with node `scale = 1`. Camera zoom is global and must not be implemented by scaling individual cards.
+
+In the planned 3D presentation, the card face is a camera-facing billboard attached to a logical board position. The billboard may change projected screen size because of perspective, but its texture and local dimensions remain native. The 2D `Node2D` card remains the rollback implementation until the camera migration gate in [game-update.md](game-update.md) passes.
 
 ## Pixel Anatomy
 

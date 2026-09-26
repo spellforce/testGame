@@ -26,7 +26,18 @@ Check these when reviewing art, the first Godot build, and every new batch.
 - [ ] Pausing shows "PAUSED" and cards can still be moved.
 - [ ] The board can't be panned fully off screen.
 
-## Pixel Art
+## Camera and 3D prototype
+
+- [ ] The 48 x 56 card prefab is at 100% native scale (`scale = 1`); no card logic changes its scale to match a screenshot.
+- [ ] The 2D baseline still passes its existing interaction self-test before the 3D prototype is enabled.
+- [ ] If 3D mode is enabled, the board is a horizontal perspective surface and its projected top/bottom width matches the reference within the agreed tolerance.
+- [ ] 3D cards are camera-facing billboards with readable rectangular faces at the board center and near both depth extremes.
+- [ ] Cursor zoom preserves the board point under the cursor during the eased camera-height transition.
+- [ ] Screen picking uses the active camera ray and board-plane intersection; no guessed zoom conversion is used.
+- [ ] Logical card positions, clamp margins, stacks, and saves are identical after switching between 2D and 3D render modes.
+- [ ] Depth ordering is deterministic for roots, stacks, held cards, and effects.
+- [ ] The 3D prototype meets the 200-card frame-time target before it replaces the 2D baseline.
+
 
 - [ ] Every asset uses only the 32 palette colors.
 - [ ] No blurry pixels anywhere: check textures use Nearest filtering and no mipmaps.

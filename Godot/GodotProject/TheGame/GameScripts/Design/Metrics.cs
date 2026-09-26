@@ -163,8 +163,8 @@ namespace GameLogic.Design
         // ======================= 相机 =======================
 
         public const float ZoomMin = 0.5f;
-        public const float ZoomDefault = 1.0f;
-        public const float ZoomMax = 2.0f;
+        public const float ZoomDefault = 1.5f;
+        public const float ZoomMax = 2.8f;
 
         /// <summary>每格滚轮 x1.15，缓动 120 ms。</summary>
         public const float ZoomStep = 1.15f;

@@ -121,8 +121,8 @@ World (art px): base unit 4. UI (UI px): base unit 4.
 | `lift.drag` | 11 px | Card moves up while held; shadow stays on the ground |
 | `shadow.rest` | +1, +2 px | Shadow offset at rest (x, y) |
 | `shadow.drag` | +2, +6 px | Shadow offset while held |
-| `zoom.min` / `zoom.default` / `zoom.max` | 0.5 / 1.0 / 2.0 | See [03 Canvas and Layout](03-canvas-layout.md) |
-| `zoom.step` | x1.15 per wheel notch, eased over 120 ms | |
+| `zoom.min` / `zoom.default` / `zoom.max` | 0.5 / 1.0 / 2.0 | See [03 Canvas and Layout](03-canvas-layout.md); these are presentation targets, not prefab scale percentages |
+| `zoom.step` | x1.15 per wheel notch, eased over 120 ms | 2D baseline token; 3D camera-height calibration is gated by [game-update.md](game-update.md) |
 | `push.speed` | 228 art px/s | Root cards push overlapping cards apart, scaled by mass |
 | `pickup.snap` | 23 art px | Snap radius for packs and the sell box |
 | `send.speed` | 514 art px/s sideways, 571 up | Cards thrown out by packs and machines |

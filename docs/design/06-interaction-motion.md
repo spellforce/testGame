@@ -6,7 +6,8 @@ The behavior below is taken from the shipped Stacklands code (Steam build, `Game
 
 **3D to 2D.** Stacklands' board is horizontal, so "position" is (x, z) and "height" is y. In our 2D port, (x, z) becomes (x, y) on screen and height becomes a visual upward offset. Colliders become plain rectangles.
 
-## Physics Constants
+**3D presentation option.** The current port maps the logical board directly to 2D coordinates. If the 3D camera prototype is approved, keep all interaction rules and saved positions in the same logical art-pixel coordinate system, then map `(x, board_y)` to `(x, board_height, z)` on a horizontal board plane. Screen input must be converted by a ray/plane intersection using the active `Camera3D`; never divide by a guessed zoom value. Cards face the camera as billboards, while depth sorting uses logical board depth plus an explicit tie-breaker for stacks and held cards. See [game-update.md](game-update.md) for the migration gate.
+
 
 | Constant | Engine value | Our value | Notes |
 | --- | --- | --- | --- |

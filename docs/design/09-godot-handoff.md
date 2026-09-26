@@ -4,7 +4,14 @@ Target: Godot 4.3 or newer, GDScript. 4.3 or newer is needed for the `TileMapLay
 
 The HUD root is 960 x 540 UI px at 16:9. On other screen shapes it is larger (for example, 1280 x 720 UI px on a 1280 x 720 window at 1x), so anchor HUD panels to their corners instead of placing them at fixed coordinates.
 
-## Pixel Rendering Approach
+## Rendering modes and camera decision
+
+The first implementation is a `Node2D` world with `Camera2D`, because it preserves crisp grid-aligned art and keeps interaction verification simple. This is the rollback baseline, not a claim that the reference is orthographic.
+
+The Stacklands reference uses a perspective ground surface and camera-facing card billboards. A 3D prototype may therefore be added with a `Node3D` world, horizontal board plane, `Camera3D`, and billboard cards. The logical card/board coordinates, art-pixel dimensions, HUD, and interaction rules must remain shared between both modes. The 3D mode is not approved for production until the projected board taper, billboard readability, cursor zoom, depth ordering, and 200-card performance pass the checks in [game-update.md](game-update.md).
+
+Do not change card prefab dimensions or per-card scale to imitate perspective. The native card asset is 48 x 56 art px at 100% scale; the camera controls presentation size.
+
 
 The world uses continuous zoom (like Stacklands), so it is **not** rendered into a fixed low-resolution viewport. Instead:
 
@@ -29,8 +36,8 @@ The world uses continuous zoom (like Stacklands), so it is **not** rendered into
 ### World Scaling
 
 ```gdscript
-# board_camera.gd
-var zoom_level := 0.5  # 0.5 (min) to 2.0 (max), see 02-design-tokens.md
+# 2D baseline: board_camera.gd
+var zoom_level := 0.5  # design scale, not card/prefab scale
 
 func _apply_zoom() -> void:
     var screen_px_per_art_px := zoom_level * get_viewport_rect().size.y / 540.0
@@ -38,6 +45,8 @@ func _apply_zoom() -> void:
         screen_px_per_art_px = maxf(1.0, roundf(screen_px_per_art_px))
     zoom = Vector2.ONE * screen_px_per_art_px
 ```
+
+For the 3D prototype, replace this conversion with a camera-height target and a cursor-ray intersection against the board plane. Do not retain a hand-written `screen_px_per_art_px` formula as the source of truth for 3D input or zoom anchoring.
 
 ### UI Scaling
 

@@ -2,20 +2,24 @@
 
 ## Stacklands Reference Measurements
 
-Taken from `1.jpeg` and `2.jpeg` (1920 x 1080, minimum zoom, board in the same place except for a pan):
+Taken from `1.jpeg` and `2.jpeg` (1920 x 1080, minimum zoom, board in the same place except for a pan). These are reference measurements, not replacement art-pixel tokens:
 
-| Item | Measured (screen px) | Ratio |
+| Item | Measured (screen px) | Ratio / engine reference |
 | --- | --- | --- |
-| Card | about 50 x 58 | engine collider 0.42 x 0.495 units |
-| Board width | 1075 (top edge) to 1137 (bottom edge), average 1106 | engine 8.86 units = 21.1 card widths |
-| Board height | about 637 | engine 5.175 units = 10.5 card heights |
-| Top slot band (inside the board) | about 79 tall | 1.43 card heights |
-| Slots in band | 9 slots, 67 px pitch | pack is 1.26 card widths |
+| Card | about 50 x 58–61 | engine collider 0.42 x 0.495 units; the collider is not the sprite footprint |
+| Board width | 1075 (top edge) to 1137 (bottom edge), average 1106 | engine 8.86 units; about 22.1 measured card widths |
+| Board height | about 637 | engine 5.175 units |
+| Top slot band (inside the board) | about 79 tall | 1.43 measured card heights |
+| Slots in band | 9 slots, 67 px pitch | pack is about 1.26 measured card widths |
 | Board on screen at min zoom | about 58% of screen width | --- |
 | Left panel column | 344 wide, 8 px margin | 18% of screen width |
 | Top-right boxes | 257 x 54 and 364 x 54 | --- |
 
-Stacklands' camera looks down at a slight angle, so the board is a trapezoid. This design uses a straight top-down view instead: tilted pixel art cannot stay on a clean grid. Ratios measured in screen space (cards per board width or height) stay valid either way.
+The measured card bounds include capture/outline/shadow variation. The binding design asset remains 48 x 56 art px at prefab scale 100%; do not change the prefab dimensions to compensate for camera projection. Stacklands cards are camera-facing billboards, while the board is a perspective ground surface. That is why the board can taper while the card face remains rectangular.
+
+The reference camera is a mild perspective view rather than a flat orthographic top-down view. The exact pitch and field of view must be calibrated from projected board corners during the Godot prototype; do not infer them from card size alone.
+
+The current 2D implementation remains the baseline. A 3D presentation prototype is planned in [game-update.md](game-update.md), with a go/no-go gate for perspective, billboard readability, pointer projection, and performance. Ratios measured in screen space stay valid as reference targets, but the 3D prototype must be judged by projected geometry rather than by forcing every card to one screen size.
 
 ## World Canvas
 
@@ -65,17 +69,30 @@ Mirrors Stacklands' row of packs and the sell slot. What the slots do is a gamep
 
 ### Zoom
 
-Zoom `z` is continuous. Screen px per art px = `z × screen_height / 540`, so the board takes the same share of the screen at any resolution.
+The logical board coordinate system remains art pixels. The current renderer uses a continuous `Camera2D` scale. The planned Stacklands-style renderer uses a `Camera3D` height/FOV pair and projects the same logical board onto a horizontal plane; these are two presentation implementations of the same coordinates.
 
-| Zoom | z | At 1080p: screen px per art px | Card on screen | Board on screen |
-| --- | --- | --- | --- | --- |
-| Min (matches the screenshots) | 0.5 | 1 | 48 x 56 | 1104 x 644 (about 58% of width) |
-| Default | 1.0 | 2 | 96 x 112 | 2208 x 1288 (pan to see all) |
-| Max | 2.0 | 4 | 192 x 224 | --- |
+For the current 2D baseline:
 
-- Mouse wheel zooms toward the cursor, x1.15 per notch, eased over 120 ms.
-- At 1080p and 4K, z = 0.5, 1.0, 1.5 and 2.0 give whole screen pixels per art px (sharpest). The optional **Pixel-perfect zoom** setting snaps to these levels (see [07 Menus and HUD](07-menus-and-hud.md)).
-- The default zoom is a starting value; tune it in playtests.
+- screen px per art px = `z × screen_height / 540`;
+- `z = 0.5` is the 100% native-art presentation at 1080p (one screen pixel per art pixel);
+- the card prefab itself stays 48 x 56 at `scale = 1`; camera zoom changes its screen size globally;
+- zoom targets are continuous and eased over 120 ms; named min/default/max values are calibration tokens, not prefab scale percentages.
+
+For the 3D prototype:
+
+- zoom changes camera height (the Stacklands model), not card `scale`;
+- cards are camera-facing billboards and the board is a horizontal perspective surface;
+- zoom toward the cursor is solved by intersecting the cursor ray with the board plane before and after changing height;
+- pitch, FOV, and height range must be recorded from the prototype capture, then promoted to tokens only after the decision gate in [game-update.md](game-update.md).
+
+| Presentation | Minimum reference target | Default target | Maximum target |
+| --- | --- | --- | --- |
+| 2D baseline `z` | 0.5 | 1.0 | 2.0 (current documented range; tune only after capture comparison) |
+| 3D prototype | calibrated camera height | calibrated camera height | calibrated camera height |
+
+Do not change the 48 x 56 prefab dimensions or add per-card scale factors to match the approximately 50 x 58–61 px reference measurements. The reference card bounds include outlines and capture variance, while the logical art footprint is the stable design token.
+
+At 1080p and 4K, the 2D baseline's pixel-perfect setting may snap screen pixels/art pixels to whole values. In 3D, perspective means projected size can vary with board depth; nearest filtering and native card assets remain mandatory, but a uniform screen size is not a valid acceptance criterion.
 
 ### Pan
 
