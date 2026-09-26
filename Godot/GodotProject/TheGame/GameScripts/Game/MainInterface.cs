@@ -2,7 +2,6 @@ using Godot;
 
 namespace GameLogic.Game
 {
-    /// <summary>3D 主界面：把纯 2D 操作区作为纹理贴到平面上。</summary>
     [Tool]
     public partial class MainInterface : Node3D
     {
@@ -33,9 +32,7 @@ namespace GameLogic.Game
         public override void _Input(InputEvent @event)
         {
             if (!Engine.IsEditorHint() && m_OperationViewport != null)
-            {
                 m_OperationViewport.PushInput(@event);
-            }
         }
 
         private void BuildWorldViewport()
@@ -49,7 +46,8 @@ namespace GameLogic.Game
                 TransparentBg = false,
                 CanvasItemDefaultTextureFilter = Viewport.DefaultCanvasItemTextureFilter.Nearest,
             };
-            if (m_OperationViewport.GetParent() == null) AddChild(m_OperationViewport);
+            if (m_OperationViewport.GetParent() == null)
+                AddChild(m_OperationViewport);
 
             if (m_OperationViewport.GetChildCount() == 0)
             {
@@ -66,47 +64,38 @@ namespace GameLogic.Game
         private void BuildPresentationCamera()
         {
             var stage = GetNodeOrNull<Node3D>("PresentationStage") ?? new Node3D { Name = "PresentationStage" };
-            if (stage.GetParent() == null) AddChild(stage);
+            if (stage.GetParent() == null)
+                AddChild(stage);
 
-            m_OperationPlane = stage.GetNodeOrNull<MeshInstance3D>("OperationPlane") ?? new MeshInstance3D
-            {
-                Name = "OperationPlane",
-                Mesh = new QuadMesh { Size = new Vector2(PlaneWidth, PlaneHeight) },
-            };
-            if (m_OperationPlane.GetParent() == null) stage.AddChild(m_OperationPlane);
+            m_OperationPlane = stage.GetNodeOrNull<MeshInstance3D>("OperationPlane") ?? new MeshInstance3D { Name = "OperationPlane" };
+            if (m_OperationPlane.GetParent() == null)
+                stage.AddChild(m_OperationPlane);
             m_OperationPlane.Mesh ??= new QuadMesh { Size = new Vector2(PlaneWidth, PlaneHeight) };
-            m_OperationPlane.MaterialOverride = new ShaderMaterial
+            var shearSlope = Mathf.Tan(Mathf.DegToRad(PlaneShearDegrees)).ToString(System.Globalization.CultureInfo.InvariantCulture);
+            var shaderMaterial = new ShaderMaterial
             {
                 Shader = new Shader
                 {
                     Code = $$"""
                         shader_type spatial;
                         render_mode unshaded, cull_disabled;
-
                         uniform sampler2D operation_texture : source_color, filter_nearest;
-                        const float SHEAR_SLOPE = {{Mathf.Tan(Mathf.DegToRad(PlaneShearDegrees)).ToString(System.Globalization.CultureInfo.InvariantCulture)}};
-
+                        const float SHEAR_SLOPE = {{shearSlope}};
                         void vertex() {
                             VERTEX.x += SHEAR_SLOPE * VERTEX.y;
                         }
-
                         void fragment() {
                             ALBEDO = texture(operation_texture, UV).rgb;
                         }
                         """
-                },
+                }
             };
-            ((ShaderMaterial)m_OperationPlane.MaterialOverride).SetShaderParameter("operation_texture", m_OperationViewport.GetTexture());
-            m_PresentationCamera = stage.GetNodeOrNull<Camera3D>("PresentationCamera") ?? new Camera3D
-            {
-                Name = "PresentationCamera",
-                Projection = Camera3D.ProjectionType.Orthogonal,
-                Size = PlaneHeight,
-                Position = new Vector3(0f, 0f, CameraDistance),
-                RotationDegrees = Vector3.Zero,
-                Current = true,
-            };
-            if (m_PresentationCamera.GetParent() == null) stage.AddChild(m_PresentationCamera);
+            shaderMaterial.SetShaderParameter("operation_texture", m_OperationViewport.GetTexture());
+            m_OperationPlane.MaterialOverride = shaderMaterial;
+
+            m_PresentationCamera = stage.GetNodeOrNull<Camera3D>("PresentationCamera") ?? new Camera3D { Name = "PresentationCamera" };
+            if (m_PresentationCamera.GetParent() == null)
+                stage.AddChild(m_PresentationCamera);
             m_PresentationCamera.Projection = Camera3D.ProjectionType.Orthogonal;
             m_PresentationCamera.Size = PlaneHeight;
             m_PresentationCamera.Position = new Vector3(0f, 0f, CameraDistance);
@@ -117,9 +106,7 @@ namespace GameLogic.Game
         private void SyncViewportSize()
         {
             if (GodotObject.IsInstanceValid(m_OperationViewport))
-            {
                 m_OperationViewport.Size = ToViewportSize(GetViewport().GetVisibleRect().Size);
-            }
         }
 
         private static Vector2I ToViewportSize(Vector2 size)
