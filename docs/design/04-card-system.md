@@ -4,6 +4,12 @@ All six card types share one 48 x 56 art px footprint, so stacking, dragging and
 
 In the planned 3D presentation, the card face is a camera-facing billboard attached to a logical board position. The billboard may change projected screen size because of perspective, but its texture and local dimensions remain native. The 2D `Node2D` card remains the rollback implementation until the camera migration gate in [game-update.md](game-update.md) passes.
 
+The editable Godot prefab includes an editor-only default preview: a cyan vehicle frame, the title `侦察战车`, a small vehicle icon, and `78 / 12` badges. Runtime `CardData` replaces these values when the card is spawned; the preview data is not gameplay state.
+
+### Shadow model
+
+The current `Shadow` child is a deliberate 2D fake shadow: a dark, offset card-shaped layer that moves its offset when the card is held. It is not a light projection. The decompiled Stacklands card also has a separate `DropShadowRenderer` visual child that is normally disabled and is enabled for inventory/work presentation; its main card renderer has a Unity shadow-casting mode that can be switched for scene lighting. For this pixel-art game, keep the fake shadow as the default in both the 2D baseline and the first 3D billboard prototype. A later 3D lighting experiment may enable real shadow casting as a measured option, but it must not replace the stable card shadow or alter card dimensions.
+
 ## Pixel Anatomy
 
 ```text

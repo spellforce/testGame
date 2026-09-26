@@ -18,6 +18,8 @@ namespace GameLogic.World
     /// </summary>
     public partial class CardWorld : Node2D
     {
+        private const string CardScenePath = "res://TheGame/Scenes/Cards/Card.tscn";
+        private PackedScene m_CardScene;
         private readonly List<CardStack> m_Stacks = new();
 
         /// <summary>每张卡的收敛目标（左上角世界坐标）。</summary>
@@ -53,7 +55,8 @@ namespace GameLogic.World
         /// </summary>
         public CardStack SpawnCard(CardData data, Vector2 topLeft)
         {
-            var view = new CardView();
+            m_CardScene ??= GD.Load<PackedScene>(CardScenePath);
+            var view = m_CardScene.Instantiate<CardView>();
             view.SetData(data);
 
             var stack = new CardStack();

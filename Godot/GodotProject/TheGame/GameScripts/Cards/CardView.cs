@@ -1,27 +1,22 @@
-using Godot;
+﻿using Godot;
 using GameLogic.Design;
 
 namespace GameLogic.Cards
 {
     /// <summary>
-    /// 单张卡的视图（design 09-godot-handoff.md "Card.tscn" + 04-card-system.md）。
-    ///
-    /// 节点结构对齐设计文档，但用 C# 直接搭：
+    /// 鍗曞紶鍗＄殑瑙嗗浘锛坉esign 09-godot-handoff.md "Card.tscn" + 04-card-system.md锛夈€?    ///
+    /// 鑺傜偣缁撴瀯瀵归綈璁捐鏂囨。锛屼絾鐢?C# 鐩存帴鎼細
     /// <code>
-    /// Card (Node2D)                 原点 = 卡牌左上角
-    ///  |- Shadow (ColorRect 48x56)  ink 45%，不随抬升移动，只扩大偏移
-    ///  |- Body (Node2D)             抬升时整体上移；逻辑位置永不改变
-    ///      |- Frame (Sprite2D)      家族卡框
+    /// Card (Node2D)                 鍘熺偣 = 鍗＄墝宸︿笂瑙?    ///  |- Shadow (ColorRect 48x56)  ink 45%锛屼笉闅忔姮鍗囩Щ鍔紝鍙墿澶у亸绉?    ///  |- Body (Node2D)             鎶崌鏃舵暣浣撲笂绉伙紱閫昏緫浣嶇疆姘镐笉鏀瑰彉
+    ///      |- Frame (Sprite2D)      瀹舵棌鍗℃
     ///      |- Icon (Sprite2D)
     ///      |- Title (Label, 10px)
     ///      |- BadgeLeft / BadgeRight
     ///      |- NewDot (Sprite2D)
-    ///      |- Outline (Sprite2D)    cyan/red 状态外框
-    /// </code>
+    ///      |- Outline (Sprite2D)    cyan/red 鐘舵€佸妗?    /// </code>
     ///
-    /// 关键规则：卡牌**永不缩放、永不旋转**（01-visual-direction.md 第 3 条），
-    /// 所有状态只用位移、描边与调色板交换表达。
-    /// </summary>
+    /// 鍏抽敭瑙勫垯锛氬崱鐗?*姘镐笉缂╂斁銆佹案涓嶆棆杞?*锛?1-visual-direction.md 绗?3 鏉★級锛?    /// 鎵€鏈夌姸鎬佸彧鐢ㄤ綅绉汇€佹弿杈逛笌璋冭壊鏉夸氦鎹㈣〃杈俱€?    /// </summary>
+    [Tool]
     public partial class CardView : Node2D
     {
         public CardData Data { get; private set; }
@@ -39,24 +34,62 @@ namespace GameLogic.Cards
         private CardState m_State = CardState.Resting;
         private float m_Lift;
 
-        /// <summary>当前抬升量（art px），由状态推导。</summary>
+        /// <summary>褰撳墠鎶崌閲忥紙art px锛夛紝鐢辩姸鎬佹帹瀵笺€?/summary>
         public float Lift => m_Lift;
 
-        /// <summary>卡牌矩形（世界坐标，原点在左上角，尺寸恒为 48 x 56）。</summary>
+        /// <summary>鍗＄墝鐭╁舰锛堜笘鐣屽潗鏍囷紝鍘熺偣鍦ㄥ乏涓婅锛屽昂瀵告亽涓?48 x 56锛夈€?/summary>
         public Rect2 Bounds => new(GlobalPosition, new Vector2(Metrics.CardW, Metrics.CardH));
 
-        /// <summary>中心点，用于邻近判定。</summary>
+        /// <summary>涓績鐐癸紝鐢ㄤ簬閭昏繎鍒ゅ畾銆?/summary>
         public Vector2 Center => GlobalPosition + new Vector2(Metrics.CardW * 0.5f, Metrics.CardH * 0.5f);
 
         public CardState State => m_State;
 
         public override void _Ready()
         {
-            BuildNodes();
+            m_Shadow = GetNode<ColorRect>("Shadow");
+            m_Body = GetNode<Node2D>("Body");
+            m_Frame = GetNode<Sprite2D>("Body/Frame");
+            m_Icon = GetNode<Sprite2D>("Body/Icon");
+            m_Title = GetNode<Label>("Body/Title");
+            m_Outline = GetNode<Sprite2D>("Body/Outline");
+            if (Engine.IsEditorHint() && Data == null)
+            {
+                Data = CreateEditorPreviewData();
+            }
             Refresh();
         }
 
-        /// <summary>绑定数据。可在 _Ready 之前调用。</summary>
+        private static CardData CreateEditorPreviewData()
+        {
+            return new CardData
+            {
+                Id = "scout_buggy_preview",
+                Family = CardFamily.Vehicle,
+                Title = "侦察战车",
+                FullName = "侦察战车",
+                Description = "预制体默认预览数据",
+                BadgeLeft = 78,
+                BadgeRight = 12,
+                Icon = BuildEditorPreviewIcon(),
+            };
+        }
+
+        private static ImageTexture BuildEditorPreviewIcon()
+        {
+            var image = Image.CreateEmpty(32, 20, false, Image.Format.Rgba8);
+            image.Fill(new Color(0, 0, 0, 0));
+            image.FillRect(new Rect2I(4, 7, 24, 8), new Color("#3d878e"));
+            image.FillRect(new Rect2I(8, 4, 16, 4), new Color("#6faeb0"));
+            image.FillRect(new Rect2I(12, 1, 8, 3), new Color("#9fc4b9"));
+            image.FillRect(new Rect2I(1, 15, 8, 3), new Color("#0e1110"));
+            image.FillRect(new Rect2I(23, 15, 8, 3), new Color("#0e1110"));
+            image.FillRect(new Rect2I(7, 16, 4, 4), new Color("#1b211f"));
+            image.FillRect(new Rect2I(21, 16, 4, 4), new Color("#1b211f"));
+            return ImageTexture.CreateFromImage(image);
+        }
+
+        /// <summary>缁戝畾鏁版嵁銆傚彲鍦?_Ready 涔嬪墠璋冪敤銆?/summary>
         public void SetData(CardData data)
         {
             Data = data;
@@ -66,66 +99,6 @@ namespace GameLogic.Cards
             }
         }
 
-        private void BuildNodes()
-        {
-            // ---- 投影：不随抬升移动，只扩大偏移（设计文档明确要求） ----
-            m_Shadow = new ColorRect
-            {
-                Name = "Shadow",
-                Color = Palette.ShadowCard,
-                Size = new Vector2(Metrics.CardW, Metrics.CardH),
-                MouseFilter = Control.MouseFilterEnum.Ignore,
-            };
-            m_Shadow.Position = new Vector2(1, 2);   // shadow.rest = +1, +2
-            AddChild(m_Shadow);
-
-            // ---- 主体：抬升时整体上移 ----
-            m_Body = new Node2D { Name = "Body" };
-            AddChild(m_Body);
-
-            m_Frame = new Sprite2D
-            {
-                Name = "Frame",
-                Centered = false,                    // 原点 = 左上角
-                TextureFilter = CanvasItem.TextureFilterEnum.Nearest,
-            };
-            m_Body.AddChild(m_Frame);
-
-            m_Icon = new Sprite2D
-            {
-                Name = "Icon",
-                Centered = true,
-                TextureFilter = CanvasItem.TextureFilterEnum.Nearest,
-                Visible = false,
-            };
-            m_Body.AddChild(m_Icon);
-
-            m_Title = new Label
-            {
-                Name = "Title",
-                Position = new Vector2(3, 1),        // 标题左对齐 x3，占据 2..11 行
-                Size = new Vector2(Metrics.CardContentW - 4, Metrics.CardHeader),
-                VerticalAlignment = VerticalAlignment.Center,
-                HorizontalAlignment = HorizontalAlignment.Left,
-                MouseFilter = Control.MouseFilterEnum.Ignore,
-                ClipText = true,
-            };
-            m_Title.AddThemeFontSizeOverride("font_size", Metrics.FontSizeCard);
-            m_Body.AddChild(m_Title);
-
-            // ---- 状态外框：画在卡牌外侧 1 px（50 x 58） ----
-            m_Outline = new Sprite2D
-            {
-                Name = "Outline",
-                Centered = false,
-                TextureFilter = CanvasItem.TextureFilterEnum.Nearest,
-                Position = new Vector2(-1, -1),
-                Visible = false,
-            };
-            m_Body.AddChild(m_Outline);
-        }
-
-        /// <summary>把当前 Data + State 渲染出来。</summary>
         public void Refresh()
         {
             if (m_Frame == null)
@@ -137,17 +110,16 @@ namespace GameLogic.Cards
 
             m_Frame.Texture = CardFramePainter.Get(style.Family, Data?.Grade ?? CardGrade.Standard);
 
-            // ---- 标题 ----
+            // ---- 鏍囬 ----
             m_Title.Text = Data?.Title ?? "";
             m_Title.AddThemeColorOverride("font_color", style.TitleColor);
 
-            // ---- 图标 ----
+            // ---- 鍥炬爣 ----
             if (Data?.Icon != null)
             {
                 m_Icon.Texture = Data.Icon;
                 m_Icon.Visible = true;
-                // 图标居中于美术区（y14..42，中心 y28）
-                m_Icon.Position = new Vector2(Metrics.CardW * 0.5f, Metrics.ArtAreaTop + Metrics.RowArtArea * 0.5f);
+                // 鍥炬爣灞呬腑浜庣編鏈尯锛坹14..42锛屼腑蹇?y28锛?                m_Icon.Position = new Vector2(Metrics.CardW * 0.5f, Metrics.ArtAreaTop + Metrics.RowArtArea * 0.5f);
             }
             else
             {
@@ -159,12 +131,9 @@ namespace GameLogic.Cards
         }
 
         /// <summary>
-        /// 刷新页脚徽章（design 04-card-system.md "Badges" + 11-card-taxonomy.md 的默认值）。
-        ///
-        /// 左徽章 x2,y44；右徽章 x33,y44，均为 13x9。数字用 3x5 点阵手绘——
-        /// zoom 0.5 下每个数字只有 3x5 art px，缩放文本会糊，
-        /// 这是设计文档坚持手绘数字而非 Label 的原因。-1 表示隐藏。
-        /// </summary>
+        /// 鍒锋柊椤佃剼寰界珷锛坉esign 04-card-system.md "Badges" + 11-card-taxonomy.md 鐨勯粯璁ゅ€硷級銆?        ///
+        /// 宸﹀窘绔?x2,y44锛涘彸寰界珷 x33,y44锛屽潎涓?13x9銆傛暟瀛楃敤 3x5 鐐归樀鎵嬬粯鈥斺€?        /// zoom 0.5 涓嬫瘡涓暟瀛楀彧鏈?3x5 art px锛岀缉鏀炬枃鏈細绯婏紝
+        /// 杩欐槸璁捐鏂囨。鍧氭寔鎵嬬粯鏁板瓧鑰岄潪 Label 鐨勫師鍥犮€?1 琛ㄧず闅愯棌銆?        /// </summary>
         private void RefreshBadges()
         {
             if (Data == null)
@@ -174,7 +143,7 @@ namespace GameLogic.Cards
 
             var style = Data.Style;
 
-            // ---- 左徽章：bone 底板 + ink 数字 ----
+            // ---- 宸﹀窘绔狅細bone 搴曟澘 + ink 鏁板瓧 ----
             if (Data.BadgeLeft >= 0)
             {
                 EnsureBadge(ref m_BadgeLeft, "BadgeLeft",
@@ -188,7 +157,7 @@ namespace GameLogic.Cards
                 m_BadgeLeft.Visible = false;
             }
 
-            // ---- 右徽章：rust.2 底板 + white 数字（Enemy 家族改用 steel.2 以便可见） ----
+            // ---- 鍙冲窘绔狅細rust.2 搴曟澘 + white 鏁板瓧锛圗nemy 瀹舵棌鏀圭敤 steel.2 浠ヤ究鍙锛?----
             if (Data.BadgeRight >= 0)
             {
                 EnsureBadge(ref m_BadgeRight, "BadgeRight",
@@ -203,7 +172,7 @@ namespace GameLogic.Cards
             }
         }
 
-        /// <summary>惰性创建徽章 Sprite（卡牌被池化复用时只建一次）。</summary>
+        /// <summary>鎯版€у垱寤哄窘绔?Sprite锛堝崱鐗岃姹犲寲澶嶇敤鏃跺彧寤轰竴娆★級銆?/summary>
         private void EnsureBadge(ref Sprite2D slot, string name, Vector2 pos)
         {
             if (slot != null)
@@ -232,7 +201,7 @@ namespace GameLogic.Cards
 
         public void ClearState() => SetStateFlag(m_State, false);
 
-        /// <summary>把状态位翻译成位移与描边。这是唯一读取 m_State 的地方。</summary>
+        /// <summary>鎶婄姸鎬佷綅缈昏瘧鎴愪綅绉讳笌鎻忚竟銆傝繖鏄敮涓€璇诲彇 m_State 鐨勫湴鏂广€?/summary>
         private void ApplyState()
         {
             bool held = m_State.HasFlag(CardState.Held);
@@ -241,20 +210,20 @@ namespace GameLogic.Cards
             bool selected = m_State.HasFlag(CardState.Selected);
             bool hover = m_State.HasFlag(CardState.Hover);
 
-            // ---- 抬升：Held 优先于 Hover ----
+            // ---- 鎶崌锛欻eld 浼樺厛浜?Hover ----
             m_Lift = held ? Metrics.LiftDrag : hover ? Metrics.LiftHover : 0f;
             if (m_Body != null)
             {
                 m_Body.Position = new Vector2(0, -m_Lift);
             }
 
-            // ---- 投影：静止 +1,+2；持握 +2,+6；且持握时压在机身下方 ----
+            // ---- 鎶曞奖锛氶潤姝?+1,+2锛涙寔鎻?+2,+6锛涗笖鎸佹彙鏃跺帇鍦ㄦ満韬笅鏂?----
             if (m_Shadow != null)
             {
                 m_Shadow.Position = held ? new Vector2(2, 6) : new Vector2(1, 2);
             }
 
-            // ---- 外框：Invalid > Selected > Valid ----
+            // ---- 澶栨锛欼nvalid > Selected > Valid ----
             if (m_Outline != null)
             {
                 if (invalid || selected || valid)
@@ -270,17 +239,14 @@ namespace GameLogic.Cards
             }
         }
 
-        /// <summary>瞬间定位（用于生成、读档；不做插值）。</summary>
+        /// <summary>鐬棿瀹氫綅锛堢敤浜庣敓鎴愩€佽妗ｏ紱涓嶅仛鎻掑€硷級銆?/summary>
         public void SnapTo(Vector2 worldPos)
         {
             GlobalPosition = new Vector2(Mathf.Round(worldPos.X), Mathf.Round(worldPos.Y));
         }
 
         /// <summary>
-        /// 堆叠计数牌（04-card-system.md）：10 张以上在根卡表头右端显示。
-        /// <paramref name="count"/> 传 -1 隐藏。
-        /// 用 3x5 点阵绘制，不依赖字体资源。
-        /// </summary>
+        /// 鍫嗗彔璁℃暟鐗岋紙04-card-system.md锛夛細10 寮犱互涓婂湪鏍瑰崱琛ㄥご鍙崇鏄剧ず銆?        /// <paramref name="count"/> 浼?-1 闅愯棌銆?        /// 鐢?3x5 鐐归樀缁樺埗锛屼笉渚濊禆瀛椾綋璧勬簮銆?        /// </summary>
         public void SetStackCount(int count)
         {
             if (count < 0 || count > 99)
@@ -299,7 +265,7 @@ namespace GameLogic.Cards
                     Name = "CountPlate",
                     Centered = false,
                     TextureFilter = CanvasItem.TextureFilterEnum.Nearest,
-                    // 表头右端，13x9 的数字牌
+                    // 琛ㄥご鍙崇锛?3x9 鐨勬暟瀛楃墝
                     Position = new Vector2(Metrics.CardW - 1 - 13 - 2, 2),
                 };
                 m_Body.AddChild(m_CountPlate);
@@ -309,7 +275,7 @@ namespace GameLogic.Cards
             m_CountPlate.Visible = true;
         }
 
-        /// <summary>是否包含一个世界坐标点（用完整 48x56 矩形，含透明角）。</summary>
+        /// <summary>鏄惁鍖呭惈涓€涓笘鐣屽潗鏍囩偣锛堢敤瀹屾暣 48x56 鐭╁舰锛屽惈閫忔槑瑙掞級銆?/summary>
         public bool HitTestPoint(Vector2 worldPos)
         {
             var b = Bounds;
