@@ -14,6 +14,7 @@ namespace GameLogic.Board
     ///
     /// 本节点负责 1-3 层；卡牌由 <see cref="Godot.Node2D"/> 子节点承载。
     /// </summary>
+    [Tool]
     public partial class BoardView : Node2D
     {
         private Sprite2D m_BoardSprite;

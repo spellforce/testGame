@@ -1,0 +1,22 @@
+[gd_scene format=3 uid="uid://jd6ewdcb1b2a"]
+
+[ext_resource type="Script" uid="uid://g7vbp7gogcyv" path="res://TheGame/GameScripts/Game/GameBoard.cs" id="1_operation_area"]
+[ext_resource type="Script" uid="uid://uk57wwik6p7a" path="res://TheGame/GameScripts/Board/BoardView.cs" id="2_board_view"]
+[ext_resource type="Script" uid="uid://bje656vb1mk7r" path="res://TheGame/GameScripts/Board/BoardCamera.cs" id="3_board_camera"]
+[ext_resource type="Script" uid="uid://bfctv2p0o0eo6" path="res://TheGame/GameScripts/World/CardWorld.cs" id="4_card_world"]
+[ext_resource type="Script" uid="uid://bdje7tnqdgsbb" path="res://TheGame/GameScripts/Interaction/DragController.cs" id="5_drag"]
+
+[node name="GameOperationArea" type="Node2D" unique_id=981733181]
+script = ExtResource("1_operation_area")
+
+[node name="BoardView" type="Node2D" parent="." unique_id=1062807847]
+script = ExtResource("2_board_view")
+
+[node name="BoardCamera" type="Camera2D" parent="." unique_id=759289866]
+script = ExtResource("3_board_camera")
+
+[node name="CardWorld" type="Node2D" parent="." unique_id=295739854]
+script = ExtResource("4_card_world")
+
+[node name="DragController" type="Node" parent="." unique_id=2026783909]
+script = ExtResource("5_drag")

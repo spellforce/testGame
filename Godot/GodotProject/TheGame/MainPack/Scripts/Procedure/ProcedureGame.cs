@@ -20,7 +20,7 @@ using GameLogic;
 public class ProcedureGame : ProcedureBase
 {
     /// <summary>棋盘场景路径。</summary>
-    private const string BoardScenePath = "res://TheGame/Scenes/GameBoard.tscn";
+    private const string BoardScenePath = "res://TheGame/Scenes/MainInterface.tscn";
 
     /// <summary>已挂载的棋盘实例。</summary>
     private static Node s_Board;

@@ -1,0 +1,29 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://TheGame/GameScripts/Game/MainInterface.cs" id="1_main_interface"]
+[ext_resource type="PackedScene" path="res://TheGame/Scenes/GameOperationArea.tscn" id="2_operation_area"]
+[ext_resource type="Script" path="res://TheGame/GameScripts/Hud/GameHud.cs" id="3_hud"]
+
+[node name="MainInterface" type="Node3D"]
+script = ExtResource("1_main_interface")
+
+[node name="OperationViewport" type="SubViewport" parent="."]
+size = Vector2i(1920, 1080)
+render_target_update_mode = 4
+canvas_item_default_texture_filter = 0
+
+[node name="GameOperationArea" parent="OperationViewport" instance=ExtResource("2_operation_area")]
+
+[node name="PresentationStage" type="Node3D" parent="."]
+
+[node name="OperationPlane" type="MeshInstance3D" parent="PresentationStage"]
+
+[node name="PresentationCamera" type="Camera3D" parent="PresentationStage"]
+projection = 1
+position = Vector3(0, 0, 10)
+rotation_degrees = Vector3(0, 0, 0)
+size = 9.0
+current = true
+
+[node name="GameHud" type="CanvasLayer" parent="."]
+script = ExtResource("3_hud")

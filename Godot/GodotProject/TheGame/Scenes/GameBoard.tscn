@@ -1,6 +1,5 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://o6utq1vpo7la"]
 
-[ext_resource type="Script" path="res://TheGame/GameScripts/Game/GameBoard.cs" id="1_board"]
+[ext_resource type="PackedScene" path="res://TheGame/Scenes/GameOperationArea.tscn" id="1_operation_area"]
 
-[node name="GameBoard" type="Node2D"]
-script = ExtResource("1_board")
+[node name="GameBoard" unique_id=1016403534 instance=ExtResource("1_operation_area")]

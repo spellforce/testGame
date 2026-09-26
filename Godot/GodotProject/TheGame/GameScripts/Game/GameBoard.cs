@@ -38,12 +38,12 @@ namespace GameLogic.Game
             Name = "GameBoard";
 
             // ---- 1. 棋盘视图 ----
-            m_Board = new BoardView { Name = "BoardView" };
-            AddChild(m_Board);
+            m_Board = GetNodeOrNull<BoardView>("BoardView") ?? new BoardView { Name = "BoardView" };
+            if (m_Board.GetParent() == null) AddChild(m_Board);
 
             // ---- 2. 摄像机 ----
-            m_Camera = new BoardCamera { Name = "BoardCamera" };
-            AddChild(m_Camera);
+            m_Camera = GetNodeOrNull<BoardCamera>("BoardCamera") ?? new BoardCamera { Name = "BoardCamera" };
+            if (m_Camera.GetParent() == null) AddChild(m_Camera);
             // 默认 0.5（最小）缩放：16-garage-and-expedition-boards.md 规定
             // 远征棋盘用 0.5，让整块棋盘一屏可见 —— 这也是 1080p 下
             // 1 art px = 1 屏幕像素、与参考截图一致的取景。
@@ -51,19 +51,15 @@ namespace GameLogic.Game
             m_Camera.CenterOnBoard();
 
             // ---- 3. 卡牌世界（挂在 BoardView 之外，靠 Reparent 把堆分层） ----
-            m_World = new CardWorld { Name = "CardWorld" };
-            AddChild(m_World);
+            m_World = GetNodeOrNull<CardWorld>("CardWorld") ?? new CardWorld { Name = "CardWorld" };
+            if (m_World.GetParent() == null) AddChild(m_World);
 
             // ---- 4. 拖拽控制器 ----
-            m_Drag = new DragController { Name = "DragController" };
-            AddChild(m_Drag);
+            m_Drag = GetNodeOrNull<DragController>("DragController") ?? new DragController { Name = "DragController" };
+            if (m_Drag.GetParent() == null) AddChild(m_Drag);
             m_Drag.Setup(m_Camera, m_World, m_Board);
 
-            // ---- 5. HUD ----
-            m_Hud = new Hud.GameHud { Name = "GameHud" };
-            AddChild(m_Hud);
-            m_Drag.HoverChanged += m_Hud.ShowCard;
-            m_Hud.PauseToggled += TogglePause;
+            m_Hud = GetNodeOrNull<Hud.GameHud>("GameHud");
 
             SpawnStarterCards();
         }
@@ -71,6 +67,19 @@ namespace GameLogic.Game
         private Hud.GameHud m_Hud;
         private bool m_Paused;
         private readonly System.Random m_Rng = new();
+
+        public void BindHud(Hud.GameHud hud)
+        {
+            m_Hud = hud;
+            if (m_Hud == null || m_Drag == null)
+            {
+                return;
+            }
+
+            m_Drag.HoverChanged += m_Hud.ShowCard;
+            m_Hud.PauseToggled += TogglePause;
+            m_Hud.SetPaused(m_Paused);
+        }
 
         /// <summary>
         /// 暂停：世界模拟停止（推动、计时），但卡牌仍可拖拽与投放
@@ -81,7 +90,7 @@ namespace GameLogic.Game
         private void TogglePause()
         {
             m_Paused = !m_Paused;
-            m_Hud.SetPaused(m_Paused);
+            m_Hud?.SetPaused(m_Paused);
         }
 
         public override void _UnhandledKeyInput(InputEvent @event)
@@ -124,7 +133,7 @@ namespace GameLogic.Game
                 var target = BoardGeometry.SnapToGrid(m_World.GetTarget(stack.Root));
                 m_World.SetTarget(stack.Root, target);
             }
-            m_Hud.Toast("已对齐网格", Palette.Olive2);
+            m_Hud?.Toast("已对齐网格", Palette.Olive2);
         }
 
         /// <summary>在游戏区随机位置生成一张随机家族的卡（调试/演示）。</summary>
@@ -138,7 +147,7 @@ namespace GameLogic.Game
                 b.Position.Y + (float)m_Rng.NextDouble() * b.Size.Y);
             var stack = m_World.SpawnCard(data, pos);
             stack.Root.SetStateFlag(CardState.New, true);
-            m_Hud.Toast($"生成：{data.Title}", Palette.Cyan3);
+            m_Hud?.Toast($"生成：{data.Title}", Palette.Cyan3);
         }
 
         public override void _Process(double delta)
